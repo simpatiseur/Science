@@ -46,28 +46,39 @@
         <div id="math-grid" style="width: 100%; height: 450px; background: white; border-radius: 10px;"></div>
         <button onclick="document.getElementById('graph-box').style.display='none'" style="width:100%; margin-top:10px; background:#ef4444;">Fermer</button>
     </div>
-
-    <script>
-        function ouvrir(id) {
-            document.getElementById('calc-box').style.display = 'none';
-            document.getElementById('graph-box').style.display = 'none';
-            document.getElementById(id).style.display = 'block';
-            if(id === 'graph-box') { calculator.resize(); }
+<script>
+    function ouvrir(id) {
+        document.getElementById('calc-box').style.display = 'none';
+        document.getElementById('graph-box').style.display = 'none';
+        document.getElementById(id).style.display = 'block';
+        
+        // Petite astuce : on force le grapheur à se réveiller
+        if(id === 'graph-box' && calculator) {
+            setTimeout(function() {
+                calculator.resize();
+            }, 500);
         }
+    }
 
-        function add(v) { document.getElementById('res').value += v; }
-        function calc() { 
-            try { document.getElementById('res').value = eval(document.getElementById('res').value); } 
-            catch { document.getElementById('res').value = 'Erreur'; } 
-        }
+    function add(v) { document.getElementById('res').value += v; }
+    function calc() { 
+        try { document.getElementById('res').value = eval(document.getElementById('res').value); } 
+        catch { document.getElementById('res').value = 'Erreur'; } 
+    }
 
-        // INITIALISATION DU GRAPHEUR AVEC CLAVIER
+    // On attend que la page soit 100% chargée pour lancer Desmos
+    var calculator;
+    window.onload = function() {
         var elt = document.getElementById('math-grid');
-        var calculator = Desmos.GraphingCalculator(elt, { 
+        calculator = Desmos.GraphingCalculator(elt, { 
             keypad: true, 
             expressions: true,
-            settingsMenu: false 
+            settingsMenu: false,
+            autosize: true
         });
-    </script>
+    };
+</script>
+
+    script>
 </body>
 </html>
