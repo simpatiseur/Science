@@ -5,19 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-CI PRO</title>
     <script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b0cf9dc2697485f4b442"></script>
+    
     <style>
         :root { --bg: #0b0f1a; --card: #161e2d; --orange: #f97316; }
         body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 15px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #1e293b; }
-        
-        /* Conteneurs */
-        #calc-box, #graph-box { display: none; background: #1e293b; padding: 15px; border-radius: 15px; border: 1px solid var(--orange); }
-        
-        /* Calculatrice */
-        .screen { width: 100%; height: 50px; background: #000; color: #0f0; text-align: right; font-size: 1.2rem; margin-bottom: 10px; border-radius: 5px; padding: 5px; box-sizing: border-box; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #1e293b; cursor: pointer; }
+        #calc-box, #graph-box { display: none; background: #1e293b; padding: 15px; border-radius: 15px; border: 1px solid var(--orange); margin-bottom: 20px; }
+        .screen { width: 100%; height: 50px; background: #000; color: #0f0; text-align: right; font-size: 1.2rem; margin-bottom: 10px; border-radius: 5px; padding: 10px; box-sizing: border-box; border: none; }
         .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        button { padding: 12px; border-radius: 5px; border: none; background: #334155; color: white; font-weight: bold; }
+        button { padding: 15px; border-radius: 8px; border: none; background: #334155; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -37,17 +34,20 @@
             <button onclick="add('/')" style="background:var(--orange)">/</button>
             <button onclick="add('7')">7</button><button onclick="add('8')">8</button><button onclick="add('9')">9</button>
             <button onclick="add('*')" style="background:var(--orange)">×</button>
+            <button onclick="add('4')">4</button><button onclick="add('5')">5</button><button onclick="add('6')">6</button>
+            <button onclick="add('-')" style="background:var(--orange)">-</button>
+            <button onclick="add('1')">1</button><button onclick="add('2')">2</button><button onclick="add('3')">3</button>
+            <button onclick="add('+')" style="background:var(--orange)">+</button>
             <button onclick="calc()" style="grid-column: span 4; background:#10b981; margin-top:5px;">EGAL (=)</button>
         </div>
     </div>
 
     <div id="graph-box">
-        <div id="math-grid" style="width: 100%; height: 400px; background: white; border-radius: 10px;"></div>
+        <div id="math-grid" style="width: 100%; height: 450px; background: white; border-radius: 10px;"></div>
         <button onclick="document.getElementById('graph-box').style.display='none'" style="width:100%; margin-top:10px; background:#ef4444;">Fermer</button>
     </div>
 
     <script>
-        // Gestion de l'affichage
         function ouvrir(id) {
             document.getElementById('calc-box').style.display = 'none';
             document.getElementById('graph-box').style.display = 'none';
@@ -55,17 +55,19 @@
             if(id === 'graph-box') { calculator.resize(); }
         }
 
-        // Logique Calculatrice
         function add(v) { document.getElementById('res').value += v; }
         function calc() { 
             try { document.getElementById('res').value = eval(document.getElementById('res').value); } 
             catch { document.getElementById('res').value = 'Erreur'; } 
         }
 
-        // Lancement du moteur Grapheur
+        // INITIALISATION DU GRAPHEUR AVEC CLAVIER
         var elt = document.getElementById('math-grid');
-        var calculator = Desmos.GraphingCalculator(elt, { keypad: true });
+        var calculator = Desmos.GraphingCalculator(elt, { 
+            keypad: true, 
+            expressions: true,
+            settingsMenu: false 
+        });
     </script>
 </body>
 </html>
-
