@@ -1,82 +1,206 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S-CI PRO</title>
-    <style>
-        :root { --bg: #0b0f1a; --card: #161e2d; --orange: #f97316; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 15px; overflow-x: hidden; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #1e293b; cursor: pointer; transition: 0.3s; }
-        .card:active { transform: scale(0.95); background: #1e293b; }
-        
-        #calc-box, #graph-box { display: none; background: #1e293b; padding: 15px; border-radius: 15px; border: 1px solid var(--orange); margin-bottom: 20px; }
-        
-        /* Style Calculatrice */
-        .screen { width: 100%; height: 60px; background: #000; color: #0f0; text-align: right; font-size: 1.5rem; margin-bottom: 10px; border-radius: 8px; padding: 10px; box-sizing: border-box; border: 2px solid #334155; }
-        .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        button { padding: 18px; border-radius: 10px; border: none; background: #334155; color: white; font-weight: bold; font-size: 1.1rem; }
-        
-        /* Style Grapheur Iframe */
-        .iframe-container { width: 100%; height: 500px; border-radius: 10px; overflow: hidden; background: white; }
-        iframe { width: 100%; height: 100%; border: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Science CI PRO</title>
+<style>
+:root{--bg:#0b0f1a;--card:#161e2d;--orange:#f97316;--green:#10b981;--red:#ef4444;--border:#1e293b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:'Segoe UI',sans-serif;padding:14px;min-height:100vh}
+h2{text-align:center;color:var(--orange);font-size:1.3rem;margin-bottom:18px;letter-spacing:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.card{background:var(--card);padding:18px 10px;border-radius:14px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.9rem;transition:border-color .2s}
+.card:active{opacity:.8}.card:hover{border-color:var(--orange)}
+.card span{display:block;font-size:1.8rem;margin-bottom:6px}
+#calc-box{display:none;background:#1e293b;padding:14px;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px}
+.screen{width:100%;min-height:54px;background:#000;color:#0f0;text-align:right;font-size:1.3rem;padding:10px 14px;border:none;border-radius:8px;font-family:monospace;word-break:break-all}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.btns button{padding:15px 4px;border-radius:8px;border:none;background:#334155;color:#fff;font-weight:700;font-size:1rem;cursor:pointer}
+.btns button:active{opacity:.7}
+.op{background:var(--orange)!important}
+.eq{background:var(--green)!important;grid-column:span 4}
+.cl{background:var(--red)!important}
+.dl{background:#64748b!important}
+#graph-box{display:none;background:#1e293b;padding:14px;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px}
+.graph-top{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+#fn-input{flex:1;min-width:160px;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:1rem}
+#btn-draw{padding:10px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+#btn-reset{padding:10px 14px;border-radius:8px;border:none;background:#334155;color:#fff;cursor:pointer;font-size:1rem}
+#graph-canvas{width:100%;border-radius:10px;display:block;touch-action:none}
+.graph-hint{font-size:.75rem;color:#64748b;margin-top:6px;text-align:center}
+.fermer-btn{width:100%;margin-top:10px;padding:12px;border-radius:8px;border:none;background:var(--red);color:#fff;font-weight:700;font-size:1rem;cursor:pointer}
+#fn-error{color:#f87171;font-size:.8rem;margin-top:4px;min-height:16px}
+</style>
 </head>
 <body>
 
-    <h2 style="text-align:center; color: var(--orange);">SCIENCE CI PRO</h2>
-    <p style="text-align:center; font-size: 0.8rem; margin-top:-10px;">Programme National • Côte d'Ivoire</p>
+<h2>⚗️ SCIENCE CI PRO</h2>
 
-    <div class="grid">
-        <div class="card" onclick="ouvrir('calc-box')">🧮<br>Calculatrice</div>
-        <div class="card" onclick="ouvrir('graph-box')">📈<br>Grapheur Pro</div>
-    </div>
+<div class="grid">
+  <div class="card" onclick="openCalc()"><span>🧮</span>Calculatrice</div>
+  <div class="card" onclick="openGraph()"><span>📈</span>Grapheur Pro</div>
+</div>
 
-    <div id="calc-box">
-        <input type="text" id="res" class="screen" readonly placeholder="0">
-        <div class="btns">
-            <button onclick="clearRes()" style="background:#ef4444">C</button>
-            <button onclick="add('(')">(</button><button onclick="add(')')">)</button>
-            <button onclick="add('/')" style="background:var(--orange)">÷</button>
-            <button onclick="add('7')">7</button><button onclick="add('8')">8</button><button onclick="add('9')">9</button>
-            <button onclick="add('*')" style="background:var(--orange)">×</button>
-            <button onclick="add('4')">4</button><button onclick="add('5')">5</button><button onclick="add('6')">6</button>
-            <button onclick="add('-')" style="background:var(--orange)">-</button>
-            <button onclick="add('1')">1</button><button onclick="add('2')">2</button><button onclick="add('3')">3</button>
-            <button onclick="add('+')" style="background:var(--orange)">+</button>
-            <button onclick="add('0')" style="grid-column: span 2;">0</button>
-            <button onclick="add('.')">.</button>
-            <button onclick="calc()" style="background:#10b981">=</button>
-        </div>
-    </div>
+<div id="calc-box">
+  <div id="screen" class="screen">0</div>
+  <div class="btns">
+    <button class="cl" onclick="clr()">C</button>
+    <button class="dl" onclick="del()">⌫</button>
+    <button onclick="add('(')">(</button>
+    <button onclick="add(')')">)</button>
+    <button onclick="add('Math.sqrt(')">√</button>
+    <button onclick="add('Math.PI')">π</button>
+    <button onclick="add('**2')">x²</button>
+    <button class="op" onclick="add('/')">÷</button>
+    <button onclick="add('7')">7</button>
+    <button onclick="add('8')">8</button>
+    <button onclick="add('9')">9</button>
+    <button class="op" onclick="add('*')">×</button>
+    <button onclick="add('4')">4</button>
+    <button onclick="add('5')">5</button>
+    <button onclick="add('6')">6</button>
+    <button class="op" onclick="add('-')">−</button>
+    <button onclick="add('1')">1</button>
+    <button onclick="add('2')">2</button>
+    <button onclick="add('3')">3</button>
+    <button class="op" onclick="add('+')">+</button>
+    <button onclick="add('0')" style="grid-column:span 2">0</button>
+    <button onclick="add('.')">.</button>
+    <button class="op" onclick="add('%')">%</button>
+    <button class="eq" onclick="calc()">=</button>
+  </div>
+</div>
 
-    <div id="graph-box">
-        <div class="iframe-container">
-            <iframe src="https://www.desmos.com/calculator?embed" id="desmos-frame"></iframe>
-        </div>
-        <button onclick="document.getElementById('graph-box').style.display='none'" style="width:100%; margin-top:10px; background:#ef4444;">Fermer le Grapheur</button>
-    </div>
+<div id="graph-box">
+  <div class="graph-top">
+    <input id="fn-input" type="text" placeholder="Ex: x*x, Math.sin(x), 2*x+1" autocomplete="off" spellcheck="false">
+    <button id="btn-draw" onclick="drawGraph()">▶ Tracer</button>
+    <button id="btn-reset" onclick="resetView()">⟳</button>
+  </div>
+  <div id="fn-error"></div>
+  <canvas id="graph-canvas"></canvas>
+  <div class="graph-hint">Pincer pour zoomer · Glisser pour déplacer</div>
+  <button class="fermer-btn" onclick="closeGraph()">✕ Fermer</button>
+</div>
 
-    <script>
-        function ouvrir(id) {
-            document.getElementById('calc-box').style.display = 'none';
-            document.getElementById('graph-box').style.display = 'none';
-            document.getElementById(id).style.display = 'block';
-        }
+<script>
+var expr='';
+function screen(){return document.getElementById('screen');}
+function openCalc(){document.getElementById('calc-box').style.display='block';document.getElementById('graph-box').style.display='none';}
+function add(v){if(expr==='0')expr='';expr+=v;screen().textContent=expr;}
+function clr(){expr='';screen().textContent='0';}
+function del(){expr=expr.slice(0,-1);screen().textContent=expr||'0';}
+function calc(){try{var r=Function('"use strict";return('+expr+')')();expr=String(parseFloat(r.toFixed(10)));screen().textContent=expr;}catch(e){screen().textContent='Erreur';expr='';}}
 
-        function add(v) { document.getElementById('res').value += v; }
-        function clearRes() { document.getElementById('res').value = ''; }
-        function calc() { 
-            try { 
-                let v = document.getElementById('res').value;
-                document.getElementById('res').value = eval(v); 
-            } catch { 
-                document.getElementById('res').value = 'Erreur'; 
-                setTimeout(clearRes, 1500);
-            } 
-        }
-    </script>
+var canvas,ctx,W,H,ox=0,oy=0,scale=60,userFn=null;
+var drag={active:false,lastX:0,lastY:0};
+var pinch={active:false,lastDist:0};
+
+function openGraph(){document.getElementById('calc-box').style.display='none';document.getElementById('graph-box').style.display='block';setTimeout(initCanvas,50);}
+function closeGraph(){document.getElementById('graph-box').style.display='none';}
+
+function initCanvas(){
+  canvas=document.getElementById('graph-canvas');
+  var box=canvas.parentElement.getBoundingClientRect();
+  W=box.width-28;H=Math.min(W*0.8,window.innerHeight*0.5);
+  canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');
+  resetView();bindEvents();
+}
+
+function resetView(){ox=0;oy=0;scale=60;redraw();}
+function toCanvas(mx,my){return{x:W/2+(mx-ox)*scale,y:H/2-(my-oy)*scale};}
+function toMath(cx,cy){return{x:ox+(cx-W/2)/scale,y:oy-(cy-H/2)/scale};}
+
+function redraw(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  drawGrid();drawAxes();if(userFn)plotFn(userFn);
+}
+
+function drawGrid(){
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+  var step=niceStep(scale);
+  var xMin=toMath(0,0).x,xMax=toMath(W,0).x,yMin=toMath(0,H).y,yMax=toMath(0,0).y;
+  var x0=Math.ceil(xMin/step)*step;
+  for(var x=x0;x<=xMax;x+=step){var cx=toCanvas(x,0).x;ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();}
+  var y0=Math.floor(yMin/step)*step;
+  for(var y=y0;y<=yMax;y+=step){var cy=toCanvas(0,y).y;ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();}
+  ctx.fillStyle='#475569';ctx.font='10px monospace';ctx.textAlign='center';
+  for(var x=x0;x<=xMax;x+=step){if(Math.abs(x)<1e-9)continue;var cx=toCanvas(x,0).x,ay=toCanvas(0,0).y;ay=Math.max(12,Math.min(H-4,ay));ctx.fillText(round2(x),cx,ay+12);}
+  ctx.textAlign='right';
+  for(var y=y0;y<=yMax;y+=step){if(Math.abs(y)<1e-9)continue;var cy=toCanvas(0,y).y,ax=toCanvas(0,0).x;ax=Math.max(28,Math.min(W-4,ax));ctx.fillText(round2(y),ax-4,cy+4);}
+}
+
+function drawAxes(){
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;
+  var o=toCanvas(0,0);
+  ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+  ctx.fillStyle='#94a3b8';arrow(W,o.y,'r');arrow(o.x,0,'u');
+  ctx.font='bold 12px monospace';ctx.fillStyle='#f97316';
+  ctx.textAlign='left';ctx.fillText('x',W-14,o.y-6);
+  ctx.textAlign='center';ctx.fillText('y',o.x+8,12);
+}
+
+function arrow(x,y,dir){
+  ctx.beginPath();
+  if(dir==='r'){ctx.moveTo(x,y);ctx.lineTo(x-8,y-4);ctx.lineTo(x-8,y+4);}
+  if(dir==='u'){ctx.moveTo(x,y);ctx.lineTo(x-4,y+8);ctx.lineTo(x+4,y+8);}
+  ctx.closePath();ctx.fill();
+}
+
+function plotFn(fn){
+  var steps=W*2,xMin=toMath(0,0).x,xMax=toMath(W,0).x,dx=(xMax-xMin)/steps;
+  ctx.strokeStyle='#f97316';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.beginPath();
+  var started=false;
+  for(var i=0;i<=steps;i++){
+    var mx=xMin+i*dx,my;
+    try{my=fn(mx);}catch(e){started=false;continue;}
+    if(!isFinite(my)||isNaN(my)){started=false;continue;}
+    var c=toCanvas(mx,my);
+    if(!started){ctx.moveTo(c.x,c.y);started=true;}else ctx.lineTo(c.x,c.y);
+  }
+  ctx.stroke();
+}
+
+function niceStep(sc){var raw=80/sc,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;if(n<1.5)return mag;if(n<3.5)return 2*mag;if(n<7.5)return 5*mag;return 10*mag;}
+function round2(v){return parseFloat(v.toPrecision(4));}
+
+function drawGraph(){
+  var raw=document.getElementById('fn-input').value.trim();
+  var err=document.getElementById('fn-error');err.textContent='';
+  if(!raw){err.textContent='⚠ Entre une fonction.';return;}
+  var expr2=raw.replace(/\^/g,'**');
+  var fn;
+  try{fn=new Function('x','return '+expr2+';');fn(0);}catch(e){err.textContent='⚠ Erreur : '+e.message;return;}
+  userFn=fn;redraw();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('fn-input').addEventListener('keydown',function(e){if(e.key==='Enter')drawGraph();});
+});
+
+function bindEvents(){
+  canvas.addEventListener('mousedown',onDown);canvas.addEventListener('mousemove',onMove);canvas.addEventListener('mouseup',onUp);
+  canvas.addEventListener('wheel',onWheel,{passive:false});
+  canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+  canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+  canvas.addEventListener('touchend',onTouchEnd);
+}
+
+function onDown(e){drag.active=true;drag.lastX=e.clientX;drag.lastY=e.clientY;}
+function onMove(e){if(!drag.active)return;var dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.clientX;drag.lastY=e.clientY;redraw();}
+function onUp(){drag.active=false;}
+function onWheel(e){e.preventDefault();var factor=e.deltaY<0?1.15:0.87;var rect=canvas.getBoundingClientRect();var mx=toMath(e.clientX-rect.left,e.clientY-rect.top);scale*=factor;ox=mx.x-(e.clientX-rect.left-W/2)/scale;oy=mx.y+(e.clientY-rect.top-H/2)/scale;redraw();}
+
+function dist(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+function mid(t){return{x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2};}
+
+function onTouchStart(e){e.preventDefault();if(e.touches.length===1){drag.active=true;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;pinch.active=false;}else if(e.touches.length===2){drag.active=false;pinch.active=true;pinch.lastDist=dist(e.touches);pinch.lastMid=mid(e.touches);}}
+function onTouchMove(e){e.preventDefault();if(pinch.active&&e.touches.length===2){var d=dist(e.touches),m=mid(e.touches),rect=canvas.getBoundingClientRect(),cx=m.x-rect.left,cy=m.y-rect.top,mathPt=toMath(cx,cy);scale*=d/pinch.lastDist;ox=mathPt.x-(cx-W/2)/scale;oy=mathPt.y+(cy-H/2)/scale;pinch.lastDist=d;pinch.lastMid=m;redraw();}else if(drag.active&&e.touches.length===1){var dx=e.touches[0].clientX-drag.lastX,dy=e.touches[0].clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;redraw();}}
+function onTouchEnd(e){if(e.touches.length<2)pinch.active=false;if(e.touches.length===0)drag.active=false;}
+</script>
 </body>
 </html>
-
