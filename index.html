@@ -1,11 +1,10 @@
-<script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b0cf9dc2697485f4b442"></script>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-CI PRO - Système Ivoirien</title>
+    <script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b0cf9dc2697485f4b442"></script>
     <style>
         :root {
             --bg-color: #0b0f1a;
@@ -14,99 +13,19 @@
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            padding: 20px;
-            background: linear-gradient(180deg, #1e293b 0%, var(--bg-color) 100%);
-            text-align: center;
-            border-bottom: 1px solid #1e293b;
-        }
-
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: sans-serif; margin: 0; padding: 0; }
+        header { padding: 20px; background: #1e293b; text-align: center; border-bottom: 1px solid #1e293b; }
         main { padding: 20px; }
-
-        .section-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin: 20px 0 10px;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #1e293b;
-            margin-left: 10px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid #1e293b;
-            cursor: pointer;
-        }
-
-        /* Style de la calculatrice */
-        #calc-container {
-            display: none;
-            background: #1e293b;
-            padding: 15px;
-            border-radius: 20px;
-            margin-top: 20px;
-            border: 1px solid var(--accent-primary);
-        }
-
-        .calc-screen {
-            width: 100%;
-            height: 50px;
-            background: #000;
-            color: #0f0;
-            text-align: right;
-            font-size: 1.5rem;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: none;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        button {
-            padding: 15px;
-            border-radius: 8px;
-            border: none;
-            background: #334155;
-            color: white;
-            font-weight: bold;
-        }
-
-        .btn-op { background: var(--accent-primary); }
-        .btn-equal { background: #10b981; grid-column: span 2; }
+        .section-title { font-size: 0.9rem; text-transform: uppercase; color: var(--text-dim); margin: 20px 0 10px; display: flex; align-items: center; }
+        .section-title::after { content: ""; flex: 1; height: 1px; background: #1e293b; margin-left: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; border: 1px solid #1e293b; cursor: pointer; }
+        
+        /* Styles des outils */
+        #calc-container, #graph-container { display: none; background: #1e293b; padding: 15px; border-radius: 20px; margin-top: 20px; border: 1px solid var(--accent-primary); }
+        .calc-screen { width: 100%; height: 50px; background: #000; color: #0f0; text-align: right; font-size: 1.5rem; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: none; box-sizing: border-box; }
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        button { padding: 15px; border-radius: 8px; border: none; background: #334155; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -119,15 +38,14 @@
     <main>
         <div class="section-title">Outils Scientifiques</div>
         <div class="grid">
-            <div class="card" onclick="toggleCalc()">
+            <div class="card" onclick="toggleTool('calc-container')">
                 <span style="font-size: 2rem;">🧮</span>
                 <span style="margin-top:10px;">Calculatrice</span>
             </div>
-            <div class="card" onclick="openGrapheur()">
-    <span style="font-size: 2rem;">📈</span>
-    <span style="margin-top:10px;">Grapheur Pro</span>
-</div>
-
+            <div class="card" onclick="toggleTool('graph-container')">
+                <span style="font-size: 2rem;">📈</span>
+                <span style="margin-top:10px;">Grapheur Pro</span>
+            </div>
         </div>
 
         <div id="calc-container">
@@ -136,75 +54,49 @@
                 <button onclick="clearDisplay()" style="background:#ef4444;">C</button>
                 <button onclick="addToDisplay('(')">(</button>
                 <button onclick="addToDisplay(')')">)</button>
-                <button class="btn-op" onclick="addToDisplay('/')">/</button>
-                
+                <button onclick="addToDisplay('/')" style="background:var(--accent-primary)">/</button>
                 <button onclick="addToDisplay('7')">7</button>
                 <button onclick="addToDisplay('8')">8</button>
                 <button onclick="addToDisplay('9')">9</button>
-                <button class="btn-op" onclick="addToDisplay('*')">×</button>
-                
+                <button onclick="addToDisplay('*')" style="background:var(--accent-primary)">×</button>
                 <button onclick="addToDisplay('4')">4</button>
                 <button onclick="addToDisplay('5')">5</button>
                 <button onclick="addToDisplay('6')">6</button>
-                <button class="btn-op" onclick="addToDisplay('-')">-</button>
-                
-                <button onclick="addToDisplay('1')">1</button>
-                <button onclick="addToDisplay('2')">2</button>
-                <button onclick="addToDisplay('3')">3</button>
-                <button class="btn-op" onclick="addToDisplay('+')">+</button>
-                
-                <button onclick="addToDisplay('0')">0</button>
-                <button onclick="addToDisplay('.')">.</button>
-                <button class="btn-equal" onclick="calculate()">=</button>
+                <button onclick="addToDisplay('-')" style="background:var(--accent-primary)">-</button>
+                <button onclick="calculate()" style="grid-column: span 4; background:#10b981; margin-top:5px;">EGAL (=)</button>
             </div>
-            <div id="graph-container" style="display:none; margin-top:20px;">
-    <div id="calculator" style="width: 100%; height: 500px; border-radius: 20px; overflow: hidden; border: 1px solid #f97316;"></div>
-    <button onclick="closeGrapheur()" style="width:100%; margin-top:10px; background:#ef4444; padding:15px; border-radius:10px; color:white; border:none;">Fermer le Grapheur</button>
-</div>
+        </div>
 
+        <div id="graph-container">
+            <div id="calculator" style="width: 100%; height: 450px; border-radius: 10px; overflow: hidden; background: #fff;"></div>
+            <button onclick="toggleTool('graph-container')" style="width:100%; margin-top:10px; background:#ef4444;">Fermer</button>
         </div>
     </main>
 
     <script>
-        function toggleCalc() {
-            const container = document.getElementById('calc-container');
-            container.style.display = (container.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function addToDisplay(val) {
-            document.getElementById('display').value += val;
-        }
-
-        function clearDisplay() {
-            document.getElementById('display').value = '';
-        }
-
-        function calculate() {
-            try {
-                const result = eval(document.getElementById('display').value);
-                document.getElementById('display').value = result;
-            } catch (e) {
-                document.getElementById('display').value = 'Erreur';
+        // Fonctions pour l'affichage
+        function toggleTool(id) {
+            const tool = document.getElementById(id);
+            const isVisible = tool.style.display === 'block';
+            document.getElementById('calc-container').style.display = 'none';
+            document.getElementById('graph-container').style.display = 'none';
+            if (!isVisible) {
+                tool.style.display = 'block';
+                if(id === 'graph-container') { calculator.resize(); }
             }
-        }let elt = document.getElementById('calculator');
-let calculator = Desmos.GraphingCalculator(elt, {
-    keypad: true,
-    expressions: true,
-    settingsMenu: false,
-    autosize: true
-});
+        }
 
-function openGrapheur() {
-    document.getElementById('graph-container').style.display = 'block';
-    calculator.resize(); // Pour s'adapter à l'écran du téléphone
-}
+        // Logique Calculatrice
+        function addToDisplay(val) { document.getElementById('display').value += val; }
+        function clearDisplay() { document.getElementById('display').value = ''; }
+        function calculate() {
+            try { document.getElementById('display').value = eval(document.getElementById('display').value); }
+            catch { document.getElementById('display').value = 'Erreur'; }
+        }
 
-function closeGrapheur() {
-    document.getElementById('graph-container').style.display = 'none';
-}
-
+        // Initialisation du Grapheur Desmos
+        var elt = document.getElementById('calculator');
+        var calculator = Desmos.GraphingCalculator(elt, { keypad: true });
     </script>
 </body>
 </html>
-
-
