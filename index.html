@@ -47,16 +47,31 @@
         <button onclick="document.getElementById('graph-box').style.display='none'" style="width:100%; margin-top:10px; background:#ef4444;">Fermer</button>
     </div>
 <script>
+    var calculator;
+
     function ouvrir(id) {
+        // On cache tout
         document.getElementById('calc-box').style.display = 'none';
         document.getElementById('graph-box').style.display = 'none';
-        document.getElementById(id).style.display = 'block';
         
-        // Petite astuce : on force le grapheur à se réveiller
-        if(id === 'graph-box' && calculator) {
+        // On montre l'élément choisi
+        var target = document.getElementById(id);
+        target.style.display = 'block';
+
+        // Si c'est le grapheur, on l'initialise seulement maintenant
+        if(id === 'graph-box') {
+            if (!calculator) {
+                var elt = document.getElementById('math-grid');
+                calculator = Desmos.GraphingCalculator(elt, { 
+                    keypad: true,
+                    expressions: true,
+                    settingsMenu: false
+                });
+            }
+            // On force le redimensionnement pour éviter le carré gris
             setTimeout(function() {
                 calculator.resize();
-            }, 500);
+            }, 300);
         }
     }
 
@@ -65,19 +80,8 @@
         try { document.getElementById('res').value = eval(document.getElementById('res').value); } 
         catch { document.getElementById('res').value = 'Erreur'; } 
     }
-
-    // On attend que la page soit 100% chargée pour lancer Desmos
-    var calculator;
-    window.onload = function() {
-        var elt = document.getElementById('math-grid');
-        calculator = Desmos.GraphingCalculator(elt, { 
-            keypad: true, 
-            expressions: true,
-            settingsMenu: false,
-            autosize: true
-        });
-        };
 </script>
+
 </body>
 </html>
 
