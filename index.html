@@ -248,4 +248,42 @@
 </script>
 
 </body>
+    <script>
+// 1. LA LISTE DES COURS (Tu peux en ajouter ici facilement)
+const chapitres6eme = [
+    { titre: "La structure de l'environnement", icone: "🌱", detail: "L'environnement est composé du vivant (êtres vivants) et du non-vivant (eau, roche, air)." },
+    { titre: "L'organisation d'une cellule", icone: "🔬", detail: "La cellule est l'unité de base de la vie. Elle comprend : noyau, cytoplasme et membrane." },
+    { titre: "Les besoins alimentaires", icone: "🍎", detail: "Origine animale, végétale et minérale. Essentiel pour la croissance et l'énergie." }
+];
+
+// 2. LA FONCTION QUI DESSINE LES COURS
+function afficherCours() {
+    const conteneur = document.getElementById('liste-cours-6eme');
+    if (conteneur) {
+        conteneur.innerHTML = chapitres6eme.map((c, index) => `
+            <div class="card" onclick="toggleMenu('c${index}')" style="margin-bottom:10px; text-align:left; border-left: 4px solid #ff6600; cursor:pointer; background:#161e2d;">
+                <span style="color:white;">${c.icone} ${c.titre}</span>
+                <span style="float:right; color:#ff6600;">❯</span>
+            </div>
+            <div id="c${index}" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; color:#cbd5e1; border:1px solid #334155;">
+                ${c.detail}
+            </div>
+        `).join('');
+    }
+}
+
+// 3. LA FONCTION POUR OUVRIR/FERMER
+function toggleMenu(id) {
+    const menu = document.getElementById(id);
+    if (menu) {
+        menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+    }
+}
+
+// 4. LANCEMENT AU CHARGEMENT
+window.onload = function() {
+    if(typeof afficherCours === "function") { afficherCours(); }
+};
+</script>
+
 </html>
