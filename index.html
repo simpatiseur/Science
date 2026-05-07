@@ -4,20 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-CI PRO</title>
-    <style>
-        :root { --bg: #0b0f1a; --card: #161e2d; --orange: #f97316; --blue: #3b82f6; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 15px; padding-bottom: 80px; }
-        
-        .header { text-align: center; padding: 10px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
-        .header h2 { color: var(--orange); margin: 0; }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #1e293b; cursor: pointer; transition: 0.2s; }
-        .card:active { transform: scale(0.95); background: #1e293b; }
-        .card i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+    /* Style des lignes de chapitres */
+.chapter-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    color: #333;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
 
-        .section { display: none; background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-top: 10px; }
-        .active { display: block; }
+.chapter-number {
+    background: #22c55e; /* Vert SVT par défaut */
+    color: white;
+    min-width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.chapter-text {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.chapter-arrow {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+/* Zone de contenu qui s'ouvre */
+.details-cours {
+    display: none; /* Caché par défaut */
+    background: #f1f5f9;
+    padding: 15px;
+    border-radius: 0 0 8px 8px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+}
+
 
         /* Navigation du bas */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--orange); z-index: 100; }
@@ -174,17 +209,38 @@
 
     // 4. L'AFFICHAGE AUTOMATIQUE
     function afficherCours() {
-        const conteneur = document.getElementById('liste-cours-6eme');
-        if(conteneur) {
-            conteneur.innerHTML = cours6eme.map((c, index) => `
-                <div class="card" onclick="toggleMenu('c${index}')" style="border-left:5px solid ${c.couleur}; margin-bottom:10px; text-align:left; padding:15px; background:#161e2d; border-radius:12px;">
-                    ${c.icone} <b>${c.matiere}</b>
-                </div>
-                <div id="c${index}" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; font-size:0.9rem; color:#cbd5e1; border:1px dashed ${c.couleur};">
-                    ${c.contenu}
-                </div>
-            `).join('');
-        }
+    const conteneur = document.getElementById('liste-cours-6eme');
+    if (!conteneur) return;
+
+    // On définit les chapitres de SVT 6ème
+    const chapitresSVT = [
+        "La structure de l'environnement",
+        "Les composantes du milieu de vie",
+        "L'organisation d'une cellule",
+        "La division cellulaire",
+        "Les besoins alimentaires de l'homme"
+    ];
+
+    let html = `<h4 style="color:#22c55e; margin: 20px 0 10px 0;">🧬 SVT</h4>`;
+
+    chapitresSVT.forEach((titre, index) => {
+        html += `
+            <div class="chapter-item" onclick="toggleMenu('detail-${index}')">
+                <div class="chapter-number">${index + 1}</div>
+                <div class="chapter-text">${titre}</div>
+                <div class="chapter-arrow">❯</div>
+            </div>
+            <div id="detail-${index}" class="details-cours">
+                <p><b>Résumé du cours :</b><br>
+                Ceci est le contenu détaillé du chapitre sur ${titre.toLowerCase()}. 
+                Idéal pour les révisions du BAC et du BEPC !</p>
+            </div>
+        `;
+    });
+
+    conteneur.innerHTML = html;
+}
+
     }
 
     // Lancement au démarrage
