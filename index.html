@@ -3,269 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S-CI PRO</title>
-    
-    </style>
-    <script>
-// 1. Tes données de cours
-const chapitres6eme = [
-    { titre: "La structure de l'environnement", icone: "🌱", detail: "L'environnement est composé du vivant (animaux, végétaux) et du non-vivant (eau, roches, air)." },
-    { titre: "L'organisation d'une cellule", icone: "🔬", detail: "La cellule est l'unité de base du vivant. Elle possède une membrane, un cytoplasme et un noyau." },
-    { titre: "Les besoins alimentaires", icone: "🍎", detail: "Les aliments ont trois origines : animale, végétale et minérale. Ils servent à grandir et avoir de l'énergie." }
-];
-
-// 2. La fonction qui crée les blocs avec TON design
-function afficherCours() {
-    const conteneur = document.getElementById('liste-cours-6eme');
-    if (!conteneur) return;
-
-    conteneur.innerHTML = chapitres6eme.map((c, index) => `
-        <div class="card" onclick="toggleMenu('cours-${index}')" style="margin-bottom:10px; text-align:left; border-left: 4px solid #ff6600; background:#161e2d; padding:15px; border-radius:10px; cursor:pointer;">
-            <span style="color:white; font-weight:bold;">${c.icone} ${c.titre}</span>
-            <span style="float:right; color:#ff6600;">❯</span>
-        </div>
-        <div id="cours-${index}" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; color:#cbd5e1; border:1px solid #334155; line-height:1.5;">
-            ${c.detail}
-        </div>
-    `).join('');
-}
-
-// 3. La fonction pour ouvrir/fermer
-function toggleMenu(id) {
-    const menu = document.getElementById(id);
-    if (menu) {
-        if (menu.style.display === "none" || menu.style.display === "") {
-            menu.style.display = "block";
-        } else {
-            menu.style.display = "none";
+    <title>SCIENCE CI PRO</title>
+    <style>
+        /* === TON STYLE D'ORIGINE EXACT === */
+        :root {
+            --orange: #ff6600;
+            --dark-blue: #0f172a;
+            --card-bg: #1e293b; /* Bleu foncé pour les cartes */
+            --text-color: white;
         }
-    }
-}
 
-// Lancement au chargement
-window.onload = afficherCours;
-</script>
+        body {
+            background-color: var(--dark-blue);
+            color: var(--text-color);
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .header h1 {
+            color: var(--orange);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .header span {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* GRILLE D'ACCUEIL */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* PAGE COURS & NAVIGATION */
+        .page {
+            display: none;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .active-page {
+            display: block;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--dark-blue);
+            padding: 10px 0;
+            border-top: 1px solid #334155;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--orange);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+    </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>SCIENCE CI PRO</h2>
-        <span style="font-size: 0.7rem; color: #94a3b8;">Réussir son BAC en Côte d'Ivoire</span>
+        <h1>SCIENCE CI PRO</h1>
+        <span>Réussir son BAC en Côte d'Ivoire</span>
     </div>
 
-    <div id="page-home" class="page active">
-        <div class="grid">
-            <div class="card" onclick="ouvrirOutil('calc-box')">🧮<br>Calculatrice</div>
-            <div class="card" onclick="ouvrirOutil('graph-box')">📈<br>Grapheur Pro</div>
-        </div>
-
-        <div id="calc-box" class="section">
-            <input type="text" id="res" class="screen" readonly placeholder="0">
-            <div class="btns">
-                <button onclick="document.getElementById('res').value=''" style="background:#ef4444">C</button>
-                <button onclick="add('(')">(</button><button onclick="add(')')">)</button>
-                <button onclick="add('/')" style="background:var(--orange)">÷</button>
-                <button onclick="calc()" style="grid-column: span 4; background:#10b981; margin-top:5px;">EGAL (=)</button>
+    <div id="page-accueil" class="page active-page">
+        <div class="grid-container">
+            <div class="card" onclick="alert('Bientôt !')">
+                <div class="card-icon">🧮</div>
+                <div class="card-title">Calculatrice</div>
+            </div>
+            <div class="card" onclick="alert('Bientôt !')">
+                <div class="card-icon">📈</div>
+                <div class="card-title">Grapheur Pro</div>
             </div>
         </div>
-
-        <div id="graph-box" class="section" style="padding:0; overflow:hidden;">
-    <iframe src="https://www.desmos.com/calculator?lang=fr" style="width:100%; height:500px; border:none;" allow="keyboard"></iframe>
-</div>
-
-
     </div>
 
-    <div id="page-cours" class="page" style="display:none; padding: 10px;">
-    <h3 style="color:var(--orange); text-align:center; margin-bottom:5px;">🎓 PROGRAMME 6ème</h3>
-    <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:20px;">Ministère de l'Éducation Nationale (CI)</p>
-
-    <div class="card" onclick="toggleMenu('svt-6')" style="border-left: 5px solid #22c55e; margin-bottom:10px; text-align:left;">
-        🧬 <b>SVT</b>
-    </div>
-    <div id="svt-6" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; border: 1px solid #22c55e;">
-        <h4 style="color:#22c55e; margin-top:0;">🌱 L'Environnement</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Le vivant (animaux, végétaux) vs le non-vivant (eau, roches).</li>
-            <li><b>La Cellule :</b> invisible à l'œil nu, c'est le constituant de base.</li>
-        </ul>
-        <h4 style="color:#22c55e;">🍎 Les Aliments</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Origines : Animale, Végétale et Minérale.</li>
-            <li>Groupes : Bâtisseurs, Énergétiques, Protecteurs.</li>
-        </ul>
+    <div id="page-cours" class="page">
+        <h2 style="color:var(--orange);">📚 Cours</h2>
+        <p>Les cours de 6ème arriveront ici.</p>
     </div>
 
-    <div class="card" onclick="toggleMenu('pc-6')" style="border-left: 5px solid #ef4444; margin-bottom:10px; text-align:left;">
-        🧪 <b>Physique-Chimie</b>
-    </div>
-    <div id="pc-6" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; border: 1px solid #ef4444;">
-        <h4 style="color:#ef4444; margin-top:0;">💧 L'Eau dans la Nature</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Les 3 états : Solide (glace), Liquide, Gazeux (vapeur).</li>
-            <li>Le cycle de l'eau : Évaporation -> Condensation -> Précipitation.</li>
-        </ul>
-        <h4 style="color:#ef4444;">⚡ Électricité</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Circuit simple : Pile, Lampe, Interrupteur, Fils.</li>
-            <li>Le rôle du générateur et des récepteurs.</li>
-        </ul>
-    </div>
-
-    <div class="card" onclick="toggleMenu('math-6')" style="border-left: 5px solid #3b82f6; margin-bottom:10px; text-align:left;">
-        📐 <b>Mathématiques</b>
-    </div>
-    <div id="math-6" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; border: 1px solid #3b82f6;">
-        <h4 style="color:#3b82f6; margin-top:0;">🔢 Nombres & Calculs</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Nombres entiers et décimaux.</li>
-            <li>Priorités opératoires (la parenthèse d'abord !).</li>
-        </ul>
-        <h4 style="color:#3b82f6;">📏 Géométrie</h4>
-        <ul style="font-size:0.9rem; color:#cbd5e1; padding-left:20px;">
-            <li>Droites parallèles (//) et perpendiculaires (⊥).</li>
-            <li>Utilisation de la règle et de l'équerre.</li>
-        </ul>
-    </div>
-</div>
-
-        <p style="margin-top:20px; color:#94a3b8;">Sélectionne une matière pour voir les mémos.</p>
+    <div id="page-quiz" class="page">
+        <h2 style="color:var(--orange);">📝 Quiz</h2>
+        <p>Bientôt...</p>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item active-nav" onclick="changerPage('page-home', this)">🏠<br>Accueil</div>
-        <div class="nav-item" onclick="changerPage('page-cours', this)">📚<br>Cours</div>
-        <div class="nav-item" onclick="alert('Bientôt disponible !')">📝<br>Quiz</div>
+        <div class="nav-item active" onclick="changerPage('accueil')">
+            <span class="nav-icon">🏠</span>Accueil
+        </div>
+        <div class="nav-item" onclick="changerPage('cours')">
+            <span class="nav-icon">📚</span>Cours
+        </div>
+        <div class="nav-item" onclick="changerPage('quiz')">
+            <span class="nav-icon">📝</span>Quiz
+        </div>
     </div>
 
     <script>
-        function changerPage(id, el) {
+        // FONCTION POUR CHANGER DE PAGE
+        function changerPage(pageId) {
             // Cacher toutes les pages
-            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-            // Afficher la page sélectionnée
-            document.getElementById(id).style.display = 'block';
-            // Changer l'icône active
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active-nav'));
-            el.classList.add('active-nav');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            // Retirer 'active' de tous les boutons de nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            // Afficher la page demandée
+            document.getElementById('page-' + pageId).classList.add('active-page');
+            
+            // Activer le bouton correspondant dans la nav
+            let index = 0;
+            if (pageId === 'accueil') index = 0;
+            if (pageId === 'cours') index = 1;
+            if (pageId === 'quiz') index = 2;
+            document.querySelectorAll('.nav-item')[index].classList.add('active');
         }
-
-        function ouvrirOutil(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function add(v) { document.getElementById('res').value += v; }
-        function calc() { try { document.getElementById('res').value = eval(document.getElementById('res').value); } catch { document.getElementById('res').value = 'Erreur'; } }
     </script>
-    <script>
-    // 1. LA FONCTION MAGIQUE (Celle qui manque !)
-    function toggleMenu(id) {
-        const menu = document.getElementById(id);
-        if (menu) {
-            if (menu.style.display === "none" || menu.style.display === "") {
-                menu.style.display = "block";
-            } else {
-                menu.style.display = "none";
-            }
-        }
-    }
-
-    // 2. CHANGER DE PAGE (Accueil / Cours / Quiz)
-    function changerPage(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active-nav'));
-        el.classList.add('active-nav');
-        
-        // Si on va sur la page cours, on s'assure qu'ils sont chargés
-        if(id === 'page-cours') { afficherCours(); }
-    }
-
-    // 3. LA LISTE DES COURS
-    const cours6eme = [
-        { matiere: "SVT", couleur: "#22c55e", icone: "🧬", contenu: "<b>🌱 L'Environnement :</b> Le vivant et le non-vivant.<br><b>🍎 Aliments :</b> Origine animale, végétale et minérale." },
-        { matiere: "Physique-Chimie", couleur: "#ef4444", icone: "🧪", contenu: "<b>💧 L'Eau :</b> Solide, Liquide, Gazeux.<br><b>⚡ Électricité :</b> Pile, lampe et fils." },
-        { matiere: "Mathématiques", couleur: "#3b82f6", icone: "📐", contenu: "<b>🔢 Calcul :</b> Nombres décimaux.<br><b>📏 Géo :</b> Droites perpendiculaires et parallèles." }
-    ];
-
-    // 4. L'AFFICHAGE AUTOMATIQUE
-    function afficherCours() {
-    const conteneur = document.getElementById('liste-cours-6eme');
-    if (!conteneur) return;
-
-    // On définit les chapitres de SVT 6ème
-    const chapitresSVT = [
-        "La structure de l'environnement",
-        "Les composantes du milieu de vie",
-        "L'organisation d'une cellule",
-        "La division cellulaire",
-        "Les besoins alimentaires de l'homme"
-    ];
-
-    let html = `<h4 style="color:#22c55e; margin: 20px 0 10px 0;">🧬 SVT</h4>`;
-
-    chapitresSVT.forEach((titre, index) => {
-        html += `
-            <div class="chapter-item" onclick="toggleMenu('detail-${index}')">
-                <div class="chapter-number">${index + 1}</div>
-                <div class="chapter-text">${titre}</div>
-                <div class="chapter-arrow">❯</div>
-            </div>
-            <div id="detail-${index}" class="details-cours">
-                <p><b>Résumé du cours :</b><br>
-                Ceci est le contenu détaillé du chapitre sur ${titre.toLowerCase()}. 
-                Idéal pour les révisions du BAC et du BEPC !</p>
-            </div>
-        `;
-    });
-
-    conteneur.innerHTML = html;
-}
-
-    }
-
-    // Lancement au démarrage
-    window.onload = afficherCours;
-</script>
 
 </body>
-    <script>
-// 1. LA LISTE DES COURS (Tu peux en ajouter ici facilement)
-const chapitres6eme = [
-    { titre: "La structure de l'environnement", icone: "🌱", detail: "L'environnement est composé du vivant (êtres vivants) et du non-vivant (eau, roche, air)." },
-    { titre: "L'organisation d'une cellule", icone: "🔬", detail: "La cellule est l'unité de base de la vie. Elle comprend : noyau, cytoplasme et membrane." },
-    { titre: "Les besoins alimentaires", icone: "🍎", detail: "Origine animale, végétale et minérale. Essentiel pour la croissance et l'énergie." }
-];
-
-// 2. LA FONCTION QUI DESSINE LES COURS
-function afficherCours() {
-    const conteneur = document.getElementById('liste-cours-6eme');
-    if (conteneur) {
-        conteneur.innerHTML = chapitres6eme.map((c, index) => `
-            <div class="card" onclick="toggleMenu('c${index}')" style="margin-bottom:10px; text-align:left; border-left: 4px solid #ff6600; cursor:pointer; background:#161e2d;">
-                <span style="color:white;">${c.icone} ${c.titre}</span>
-                <span style="float:right; color:#ff6600;">❯</span>
-            </div>
-            <div id="c${index}" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; color:#cbd5e1; border:1px solid #334155;">
-                ${c.detail}
-            </div>
-        `).join('');
-    }
-}
-
-// 3. LA FONCTION POUR OUVRIR/FERMER
-function toggleMenu(id) {
-    const menu = document.getElementById(id);
-    if (menu) {
-        menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-    }
-}
-
-// 4. LANCEMENT AU CHARGEMENT
-window.onload = function() {
-    if(typeof afficherCours === "function") { afficherCours(); }
-};
-</script>
-
 </html>
