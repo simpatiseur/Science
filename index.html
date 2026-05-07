@@ -72,12 +72,10 @@ h2{text-align:center;color:var(--orange);font-size:1.3rem;margin-bottom:18px;let
   </div>
 </div>
 
-<div id="graph-box">
-  <div class="graph-top">
-    <input id="fn-input" type="text" placeholder="Ex: x*x, Math.sin(x), 2*x+1" autocomplete="off" spellcheck="false">
-    <button id="btn-draw" onclick="drawGraph()">▶ Tracer</button>
-    <button id="btn-reset" onclick="resetView()">⟳</button>
-  </div>
+<div id="graph-box" class="section" style="padding:0; overflow:hidden;">
+    <iframe src="https://www.desmos.com/calculator?lang=fr" style="width:100%; height:500px; border:none;" allow="keyboard"></iframe>
+</div>
+
   <div id="fn-error"></div>
   <canvas id="graph-canvas"></canvas>
   <div class="graph-hint">Pincer pour zoomer · Glisser pour déplacer</div>
