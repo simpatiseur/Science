@@ -141,5 +141,55 @@
         function add(v) { document.getElementById('res').value += v; }
         function calc() { try { document.getElementById('res').value = eval(document.getElementById('res').value); } catch { document.getElementById('res').value = 'Erreur'; } }
     </script>
+    <script>
+    // 1. LA FONCTION MAGIQUE (Celle qui manque !)
+    function toggleMenu(id) {
+        const menu = document.getElementById(id);
+        if (menu) {
+            if (menu.style.display === "none" || menu.style.display === "") {
+                menu.style.display = "block";
+            } else {
+                menu.style.display = "none";
+            }
+        }
+    }
+
+    // 2. CHANGER DE PAGE (Accueil / Cours / Quiz)
+    function changerPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active-nav'));
+        el.classList.add('active-nav');
+        
+        // Si on va sur la page cours, on s'assure qu'ils sont chargés
+        if(id === 'page-cours') { afficherCours(); }
+    }
+
+    // 3. LA LISTE DES COURS
+    const cours6eme = [
+        { matiere: "SVT", couleur: "#22c55e", icone: "🧬", contenu: "<b>🌱 L'Environnement :</b> Le vivant et le non-vivant.<br><b>🍎 Aliments :</b> Origine animale, végétale et minérale." },
+        { matiere: "Physique-Chimie", couleur: "#ef4444", icone: "🧪", contenu: "<b>💧 L'Eau :</b> Solide, Liquide, Gazeux.<br><b>⚡ Électricité :</b> Pile, lampe et fils." },
+        { matiere: "Mathématiques", couleur: "#3b82f6", icone: "📐", contenu: "<b>🔢 Calcul :</b> Nombres décimaux.<br><b>📏 Géo :</b> Droites perpendiculaires et parallèles." }
+    ];
+
+    // 4. L'AFFICHAGE AUTOMATIQUE
+    function afficherCours() {
+        const conteneur = document.getElementById('liste-cours-6eme');
+        if(conteneur) {
+            conteneur.innerHTML = cours6eme.map((c, index) => `
+                <div class="card" onclick="toggleMenu('c${index}')" style="border-left:5px solid ${c.couleur}; margin-bottom:10px; text-align:left; padding:15px; background:#161e2d; border-radius:12px;">
+                    ${c.icone} <b>${c.matiere}</b>
+                </div>
+                <div id="c${index}" style="display:none; background:#1e293b; padding:15px; border-radius:10px; margin-bottom:15px; font-size:0.9rem; color:#cbd5e1; border:1px dashed ${c.couleur};">
+                    ${c.contenu}
+                </div>
+            `).join('');
+        }
+    }
+
+    // Lancement au démarrage
+    window.onload = afficherCours;
+</script>
+
 </body>
 </html>
