@@ -1,4 +1,1223 @@
-ton-repo/
-├── index.html  ← remplace l'ancien
-├── lecon1_les_lentilles.html  ← nouveau
-└── lecon2_defauts_oeil.html  ← nouveau
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Science CI PRO</title>
+<style>
+:root{--bg:#0b0f1a;--card:#161e2d;--orange:#f97316;--green:#10b981;--red:#ef4444;--border:#1e293b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:'Segoe UI',sans-serif;padding:14px;min-height:100vh}
+h2{text-align:center;color:var(--orange);font-size:1.3rem;margin-bottom:18px;letter-spacing:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.card{background:var(--card);padding:18px 10px;border-radius:14px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.9rem;transition:border-color .2s}
+.card:active{opacity:.8}.card:hover{border-color:var(--orange)}
+.card span{display:block;font-size:1.8rem;margin-bottom:6px}
+
+/* SECTION TITRE */
+.section-titre{font-size:.75rem;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin:6px 0 10px;padding-left:4px}
+
+/* COURS */
+#cours-box{display:none;background:#161e2d;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px;overflow:hidden}
+.cours-header{background:linear-gradient(135deg,#0ab395,#0891b2);padding:14px;display:flex;align-items:center;gap:10px}
+.cours-header-icon{font-size:1.8rem}
+.cours-header-text h3{font-size:1rem;font-weight:900;color:white;margin-bottom:2px}
+.cours-header-text p{font-size:.75rem;color:rgba(255,255,255,.8)}
+.matiere-bloc{padding:12px 14px}
+.matiere-titre{font-size:.72rem;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.matiere-titre::before{content:'';display:block;width:20px;height:2px;background:var(--orange);border-radius:2px}
+.cours-liste{display:flex;flex-direction:column;gap:8px}
+.cours-item{background:#0f172a;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid #1e293b;transition:border-color .2s;text-decoration:none}
+.cours-item:hover{border-color:#0ab395}
+.cours-item:active{opacity:.8}
+.cours-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.cours-info{flex:1}
+.cours-nom{font-size:.86rem;font-weight:800;color:white;margin-bottom:2px}
+.cours-detail{font-size:.72rem;color:#64748b}
+.cours-arrow{font-size:.9rem;color:#64748b}
+.sep-matiere{height:1px;background:#1e293b;margin:10px 0}
+.fermer-btn{width:100%;padding:12px;border:none;background:var(--red);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'Segoe UI',sans-serif}
+
+/* CALC */
+#calc-box{display:none;background:#1e293b;padding:14px;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px}
+.screen{width:100%;min-height:54px;background:#000;color:#0f0;text-align:right;font-size:1.3rem;padding:10px 14px;border:none;border-radius:8px;font-family:monospace;word-break:break-all}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.btns button{padding:15px 4px;border-radius:8px;border:none;background:#334155;color:#fff;font-weight:700;font-size:1rem;cursor:pointer}
+.btns button:active{opacity:.7}
+.op{background:var(--orange)!important}
+.eq{background:var(--green)!important;grid-column:span 4}
+.cl{background:var(--red)!important}
+.dl{background:#64748b!important}
+
+/* GRAPH */
+#graph-box{display:none;background:#1e293b;padding:0;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px;overflow:hidden}
+.graph-top{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:14px 14px 0}
+#fn-input{flex:1;min-width:160px;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:1rem}
+#btn-draw{padding:10px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+#btn-reset{padding:10px 14px;border-radius:8px;border:none;background:#334155;color:#fff;cursor:pointer;font-size:1rem}
+#graph-canvas{width:100%;border-radius:0;display:block;touch-action:none}
+.graph-hint{font-size:.75rem;color:#64748b;margin-top:6px;text-align:center;padding:0 14px 14px}
+#fn-error{color:#f87171;font-size:.8rem;margin-top:4px;min-height:16px;padding:0 14px}
+</style>
+</head>
+<body>
+
+<h2>⚗️ SCIENCE CI PRO</h2>
+
+<div class="grid">
+  <div class="card" onclick="openCalc()"><span>🧮</span>Calculatrice</div>
+  <div class="card" onclick="openGraph()"><span>📈</span>Grapheur Pro</div>
+</div>
+
+<!-- BOUTON COURS -->
+<div class="grid" style="grid-template-columns:1fr;margin-bottom:18px">
+  <div class="card" onclick="openCours()" style="padding:16px 10px">
+    <span>📚</span>Cours 3ème
+    <div style="font-size:.72rem;color:#64748b;margin-top:4px">Physique · Chimie · CI</div>
+  </div>
+</div>
+
+<!-- SECTION COURS -->
+<div id="cours-box">
+  <div class="cours-header">
+    <div class="cours-header-icon">📚</div>
+    <div class="cours-header-text">
+      <h3>Cours de 3ème</h3>
+      <p>Physique-Chimie · Côte d'Ivoire</p>
+    </div>
+  </div>
+
+  <!-- OPTIQUE -->
+  <div class="matiere-bloc">
+    <div class="matiere-titre">⚡ Physique – Optique</div>
+    <div class="cours-liste">
+      <a class="cours-item" href="lecon1_les_lentilles.html">
+        <div class="cours-icon" style="background:rgba(10,179,149,.15)">🔍</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Lentilles</div>
+          <div class="cours-detail">Leçon 1 · Vergence · Construction d'image · Tracé</div>
+        </div>
+        <div class="cours-arrow">›</div>
+      </a>
+      <a class="cours-item" href="lecon2_defauts_oeil.html">
+        <div class="cours-icon" style="background:rgba(59,130,246,.15)">👁️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Défauts de l'Œil</div>
+          <div class="cours-detail">Leçon 2 · Myopie · Hypermétropie · Correction</div>
+        </div>
+        <div class="cours-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- MÉCANIQUE (à venir) -->
+    <div class="matiere-titre">⚙️ Physique – Mécanique</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">⚖️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Poids et Masse</div>
+          <div class="cours-detail">Leçon 3 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">💪</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Forces</div>
+          <div class="cours-detail">Leçon 4 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">⚡</div>
+        <div class="cours-info">
+          <div class="cours-nom">Travail & Puissance</div>
+          <div class="cours-detail">Leçon 5 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- ÉLECTRICITÉ (à venir) -->
+    <div class="matiere-titre">🔌 Physique – Électricité</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(234,179,8,.15)">💡</div>
+        <div class="cours-info">
+          <div class="cours-nom">Puissance & Énergie Électrique</div>
+          <div class="cours-detail">Leçon 6 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- CHIMIE (à venir) -->
+    <div class="matiere-titre">🧪 Chimie</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">⚗️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Électrolyse & Synthèse de l'eau</div>
+          <div class="cours-detail">Leçon 7 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">🛢️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Alcanes</div>
+          <div class="cours-detail">Leçon 8 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">🧫</div>
+        <div class="cours-info">
+          <div class="cours-nom">Solutions Acides & Basiques</div>
+          <div class="cours-detail">Leçon 9 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fermer-btn" onclick="closeCours()">✕ Fermer</button>
+</div>
+
+<!-- CALCULATRICE -->
+<div id="calc-box">
+  <div id="screen" class="screen">0</div>
+  <div class="btns">
+    <button class="cl" onclick="clr()">C</button>
+    <button class="dl" onclick="del()">⌫</button>
+    <button onclick="add('(')">(</button>
+    <button onclick="add(')')">)</button>
+    <button onclick="add('Math.sqrt(')">√</button>
+    <button onclick="add('Math.PI')">π</button>
+    <button onclick="add('**2')">x²</button>
+    <button class="op" onclick="add('/')">÷</button>
+    <button onclick="add('7')">7</button>
+    <button onclick="add('8')">8</button>
+    <button onclick="add('9')">9</button>
+    <button class="op" onclick="add('*')">×</button>
+    <button onclick="add('4')">4</button>
+    <button onclick="add('5')">5</button>
+    <button onclick="add('6')">6</button>
+    <button class="op" onclick="add('-')">−</button>
+    <button onclick="add('1')">1</button>
+    <button onclick="add('2')">2</button>
+    <button onclick="add('3')">3</button>
+    <button class="op" onclick="add('+')">+</button>
+    <button onclick="add('0')" style="grid-column:span 2">0</button>
+    <button onclick="add('.')">.</button>
+    <button class="op" onclick="add('%')">%</button>
+    <button class="eq" onclick="calc()">=</button>
+  </div>
+  <button class="fermer-btn" style="margin-top:10px;border-radius:8px" onclick="closeCalc()">✕ Fermer</button>
+</div>
+
+<!-- GRAPHEUR -->
+<div id="graph-box">
+  <div class="graph-top">
+    <input id="fn-input" type="text" placeholder="Ex: x**2 ou Math.sin(x)" autocomplete="off"/>
+    <button id="btn-draw" onclick="drawGraph()">Tracer</button>
+    <button id="btn-reset" onclick="resetView()">↺</button>
+  </div>
+  <div id="fn-error"></div>
+  <canvas id="graph-canvas"></canvas>
+  <div class="graph-hint">Glisse pour déplacer · Pinch pour zoomer</div>
+  <button class="fermer-btn" onclick="closeGraph()">✕ Fermer</button>
+</div>
+
+<script>
+// ── NAVIGATION ──
+function openCalc(){
+  document.getElementById('calc-box').style.display='block';
+  document.getElementById('graph-box').style.display='none';
+  document.getElementById('cours-box').style.display='none';
+}
+function closeCalc(){document.getElementById('calc-box').style.display='none';}
+
+function openGraph(){
+  document.getElementById('calc-box').style.display='none';
+  document.getElementById('graph-box').style.display='block';
+  document.getElementById('cours-box').style.display='none';
+  setTimeout(initCanvas,50);
+}
+function closeGraph(){document.getElementById('graph-box').style.display='none';}
+
+function openCours(){
+  document.getElementById('cours-box').style.display='block';
+  document.getElementById('calc-box').style.display='none';
+  document.getElementById('graph-box').style.display='none';
+  document.getElementById('cours-box').scrollIntoView({behavior:'smooth'});
+}
+function closeCours(){document.getElementById('cours-box').style.display='none';}
+
+// ── CALCULATRICE ──
+var expr='';
+function screen(){return document.getElementById('screen');}
+function add(v){if(expr==='0')expr='';expr+=v;screen().textContent=expr;}
+function clr(){expr='';screen().textContent='0';}
+function del(){expr=expr.slice(0,-1);screen().textContent=expr||'0';}
+function calc(){
+  try{var r=Function('"use strict";return('+expr+')')();expr=String(parseFloat(r.toFixed(10)));screen().textContent=expr;}
+  catch(e){screen().textContent='Erreur';expr='';}
+}
+
+// ── GRAPHEUR ──
+var canvas,ctx,W,H,ox=0,oy=0,scale=60,userFn=null;
+var drag={active:false,lastX:0,lastY:0};
+var pinch={active:false,lastDist:0};
+
+function initCanvas(){
+  canvas=document.getElementById('graph-canvas');
+  var box=canvas.parentElement.getBoundingClientRect();
+  W=box.width;H=Math.min(W*0.8,window.innerHeight*0.5);
+  canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');
+  resetView();bindEvents();
+}
+function resetView(){ox=0;oy=0;scale=60;redraw();}
+function toCanvas(mx,my){return{x:W/2+(mx-ox)*scale,y:H/2-(my-oy)*scale};}
+function toMath(cx,cy){return{x:ox+(cx-W/2)/scale,y:oy-(cy-H/2)/scale};}
+function redraw(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  drawGrid();drawAxes();if(userFn)plotFn(userFn);
+}
+function drawGrid(){
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+  var step=niceStep(scale);
+  var xMin=toMath(0,0).x,xMax=toMath(W,0).x,yMin=toMath(0,H).y,yMax=toMath(0,0).y;
+  var x0=Math.ceil(xMin/step)*step;
+  for(var x=x0;x<=xMax;x+=step){var cx=toCanvas(x,0).x;ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();}
+  var y0=Math.floor(yMin/step)*step;
+  for(var y=y0;y<=yMax;y+=step){var cy=toCanvas(0,y).y;ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();}
+  ctx.fillStyle='#475569';ctx.font='10px monospace';ctx.textAlign='center';
+  for(var x=x0;x<=xMax;x+=step){if(Math.abs(x)<1e-9)continue;var cx=toCanvas(x,0).x,ay=toCanvas(0,0).y;ay=Math.max(12,Math.min(H-4,ay));ctx.fillText(round2(x),cx,ay+12);}
+  ctx.textAlign='right';
+  for(var y=y0;y<=yMax;y+=step){if(Math.abs(y)<1e-9)continue;var cy=toCanvas(0,y).y,ax=toCanvas(0,0).x;ax=Math.max(28,Math.min(W-4,ax));ctx.fillText(round2(y),ax-4,cy+4);}
+}
+function drawAxes(){
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;
+  var o=toCanvas(0,0);
+  ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+  ctx.fillStyle='#94a3b8';arrow(W,o.y,'r');arrow(o.x,0,'u');
+  ctx.font='bold 12px monospace';ctx.fillStyle='#f97316';
+  ctx.textAlign='left';ctx.fillText('x',W-14,o.y-6);
+  ctx.textAlign='center';ctx.fillText('y',o.x+8,12);
+}
+function arrow(x,y,dir){
+  ctx.beginPath();
+  if(dir==='r'){ctx.moveTo(x,y);ctx.lineTo(x-8,y-4);ctx.lineTo(x-8,y+4);}
+  if(dir==='u'){ctx.moveTo(x,y);ctx.lineTo(x-4,y+8);ctx.lineTo(x+4,y+8);}
+  ctx.closePath();ctx.fill();
+}
+function plotFn(fn){
+  var steps=W*2,xMin=toMath(0,0).x,xMax=toMath(W,0).x,dx=(xMax-xMin)/steps;
+  ctx.strokeStyle='#f97316';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.beginPath();
+  var started=false;
+  for(var i=0;i<=steps;i++){
+    var mx=xMin+i*dx,my;
+    try{my=fn(mx);}catch(e){started=false;continue;}
+    if(!isFinite(my)||isNaN(my)){started=false;continue;}
+    var c=toCanvas(mx,my);
+    if(!started){ctx.moveTo(c.x,c.y);started=true;}else ctx.lineTo(c.x,c.y);
+  }
+  ctx.stroke();
+}
+function niceStep(sc){var raw=80/sc,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;if(n<1.5)return mag;if(n<3.5)return 2*mag;if(n<7.5)return 5*mag;return 10*mag;}
+function round2(v){return parseFloat(v.toPrecision(4));}
+function drawGraph(){
+  var raw=document.getElementById('fn-input').value.trim();
+  var err=document.getElementById('fn-error');err.textContent='';
+  if(!raw){err.textContent='⚠ Entre une fonction.';return;}
+  var expr2=raw.replace(/\^/g,'**');
+  var fn;
+  try{fn=new Function('x','return '+expr2+';');fn(0);}catch(e){err.textContent='⚠ Erreur : '+e.message;return;}
+  userFn=fn;redraw();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('fn-input').addEventListener('keydown',function(e){if(e.key==='Enter')drawGraph();});
+});
+function bindEvents(){
+  canvas.addEventListener('mousedown',onDown);canvas.addEventListener('mousemove',onMove);canvas.addEventListener('mouseup',onUp);
+  canvas.addEventListener('wheel',onWheel,{passive:false});
+  canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+  canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+  canvas.addEventListener('touchend',onTouchEnd);
+}
+function onDown(e){drag.active=true;drag.lastX=e.clientX;drag.lastY=e.clientY;}
+function onMove(e){if(!drag.active)return;var dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.clientX;drag.lastY=e.clientY;redraw();}
+function onUp(){drag.active=false;}
+function onWheel(e){e.preventDefault();var factor=e.deltaY<0?1.15:0.87;var rect=canvas.getBoundingClientRect();var mx=toMath(e.clientX-rect.left,e.clientY-rect.top);scale*=factor;ox=mx.x-(e.clientX-rect.left-W/2)/scale;oy=mx.y+(e.clientY-rect.top-H/2)/scale;redraw();}
+function dist(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+function mid(t){return{x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2};}
+function onTouchStart(e){e.preventDefault();if(e.touches.length===1){drag.active=true;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;pinch.active=false;}else if(e.touches.length===2){drag.active=false;pinch.active=true;pinch.lastDist=dist(e.touches);pinch.lastMid=mid(e.touches);}}
+function onTouchMove(e){e.preventDefault();if(pinch.active&&e.touches.length===2){var d=dist(e.touches),m=mid(e.touches),rect=canvas.getBoundingClientRect(),cx=m.x-rect.left,cy=m.y-rect.top,mathPt=toMath(cx,cy);scale*=d/pinch.lastDist;ox=mathPt.x-(cx-W/2)/scale;oy=mathPt.y+(cy-H/2)/scale;pinch.lastDist=d;pinch.lastMid=m;redraw();}else if(drag.active&&e.touches.length===1){var dx=e.touches[0].clientX-drag.lastX,dy=e.touches[0].clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;redraw();}}
+function onTouchEnd(e){if(e.touches.length<2)pinch.active=false;if(e.touches.length===0)drag.active=false;}
+</script>
+</body>
+            </html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Les Lentilles – 3ème</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:#f5f7fa;color:#1a2332;min-height:100vh}
+
+.header{background:#0ab395;color:white;padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99;box-shadow:0 2px 12px rgba(10,179,149,.4)}
+.btn-back{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{font-size:1rem;font-weight:800;flex:1;line-height:1.2}
+
+.content{padding:14px 14px 40px;max-width:680px;margin:0 auto}
+
+.fiche{background:white;border:2px solid #0ab395;border-radius:14px;padding:14px;margin-bottom:14px;text-align:center}
+.fiche-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.fiche-niveau{background:#0ab395;color:white;font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:8px;text-align:left;line-height:1.5}
+.fiche-logo{font-size:2rem}
+.fiche-ecole{font-size:.75rem;font-weight:800;color:#0ab395;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fiche-titre-cours{font-size:1rem;font-weight:900;color:#1a2332;margin:8px 0 4px;text-transform:uppercase}
+.fiche-duree{font-size:.78rem;color:#6b7a8d;font-weight:700}
+
+.comp-box{background:#f0fdf9;border-left:4px solid #0ab395;border-radius:0 10px 10px 0;padding:10px 12px;margin-bottom:10px;font-size:.82rem;line-height:1.6}
+.comp-box strong{color:#0ab395;display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+
+.lecon-titre{background:#0ab395;color:white;border-radius:10px;padding:10px 14px;font-size:.95rem;font-weight:900;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+
+.bloc{background:white;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.bloc-titre{font-size:.92rem;font-weight:900;color:#0ab395;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #f0fdf9;text-transform:uppercase;letter-spacing:.3px}
+.bloc-sous{font-size:.85rem;font-weight:800;color:#1a2332;margin:10px 0 6px}
+
+p{font-size:.87rem;line-height:1.75;color:#334155;margin-bottom:6px}
+ul,ol{padding-left:20px;margin-bottom:6px}
+li{font-size:.87rem;line-height:1.75;color:#334155}
+
+.definition{background:#f0fdf9;border-left:3px solid #0ab395;border-radius:0 10px 10px 0;padding:10px 14px;margin:8px 0;font-size:.86rem;line-height:1.7;color:#064e3b}
+.propriete{background:#eff6ff;border-left:3px solid #3b82f6;border-radius:0 10px 10px 0;padding:10px 14px;margin:8px 0;font-size:.86rem;line-height:1.7;color:#1e3a5f}
+.formule{background:#1a2332;border-radius:10px;padding:12px 16px;font-family:monospace;font-size:.95rem;color:#0ab395;margin:8px 0;text-align:center;line-height:1.6}
+.unite{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:.84rem;line-height:1.7}
+
+.exemple-box{background:#fefce8;border-radius:12px;padding:12px 14px;margin:10px 0;border:1px solid #fde68a}
+.exemple-label{font-size:.75rem;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.exemple-label::before{content:'💡';font-size:.9rem}
+.exemple-box p,.exemple-box li{color:#78350f;font-size:.85rem}
+.solution{background:#f0fdf4;border-radius:8px;padding:8px 12px;margin-top:8px;border:1px solid #bbf7d0}
+.solution-label{font-size:.73rem;font-weight:900;color:#065f46;text-transform:uppercase;margin-bottom:4px}
+.solution p,.solution li{color:#065f46;font-size:.84rem}
+
+.fixation{background:#fdf4ff;border-radius:12px;padding:12px 14px;margin:10px 0;border:1px solid #e9d5ff}
+.fixation-label{font-size:.75rem;font-weight:900;color:#6b21a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.fixation-label::before{content:'✏️';font-size:.9rem}
+.fixation p,.fixation li{color:#4c1d95;font-size:.85rem}
+.btn-sol{margin-top:10px;padding:8px 16px;border-radius:8px;border:none;background:#8b5cf6;color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;transition:opacity .2s}
+.btn-sol:active{opacity:.8}
+.sol-hidden{display:none;margin-top:10px;background:#f5f3ff;border-radius:8px;padding:10px 12px;border:1px solid #ddd6fe}
+.sol-hidden.show{display:block}
+.sol-hidden p,.sol-hidden li{color:#4c1d95;font-size:.84rem}
+
+.retenir{background:linear-gradient(135deg,#0ab395,#0891b2);border-radius:12px;padding:12px 14px;margin:10px 0;color:white}
+.retenir-label{font-size:.73rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;opacity:.9;margin-bottom:4px}
+.retenir p,.retenir li{color:white;font-size:.85rem;opacity:.95}
+
+.sep{height:1px;background:#e2e8f0;margin:14px 0}
+
+.ex-final{background:white;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-top:4px solid var(--c,#0ab395)}
+.ex-num{font-size:.75rem;font-weight:900;color:var(--c,#0ab395);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ex-final p,.ex-final li{font-size:.86rem;color:#334155;line-height:1.75}
+.tag{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:10px;margin-bottom:8px}
+.tag-app{background:#dbeafe;color:#1e40af}
+.tag-appro{background:#fce7f3;color:#9d174d}
+
+/* Schéma lentilles SVG */
+.schema-container{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:10px 0;text-align:center;overflow-x:auto}
+.schema-label{font-size:.75rem;font-weight:800;color:#6b7a8d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.83rem}
+th{background:#0ab395;color:white;padding:7px 8px;text-align:left;font-weight:700}
+td{border:1px solid #e2e8f0;padding:7px 8px}
+tr:nth-child(even) td{background:#f8fafc}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="btn-back" onclick="history.back()">←</button>
+  <h1>Les Lentilles – 3ème</h1>
+</div>
+
+<div class="content">
+
+  <!-- FICHE -->
+  <div class="fiche">
+    <div class="fiche-top">
+      <div class="fiche-niveau">3ème<br>PHYSIQUE</div>
+      <div class="fiche-logo">🇨🇮</div>
+    </div>
+    <div class="fiche-ecole">Côte d'Ivoire – Mon École à la Maison</div>
+    <div class="fiche-titre-cours">Les Lentilles</div>
+    <div class="fiche-duree">⏱ Durée estimée : 4 heures · Compétence 1 – Optique</div>
+  </div>
+
+  <!-- COMPÉTENCE -->
+  <div class="comp-box">
+    <strong>Compétence</strong>
+    Traiter une situation relative à l'optique, notamment distinguer les lentilles, déterminer leurs foyers et construire l'image d'un objet à travers une lentille convergente.
+  </div>
+  <div class="comp-box">
+    <strong>Thème</strong>
+    Optique – Leçon 1 sur 2
+  </div>
+
+  <!-- LEÇON -->
+  <div class="lecon-titre">Leçon 1 : Les Lentilles</div>
+
+  <!-- SITUATION D'APPRENTISSAGE -->
+  <div class="bloc">
+    <div class="bloc-titre">A. Situation d'apprentissage</div>
+    <p>Le conseil d'enseignement de Physique-Chimie du Lycée Moderne de Dimbokro organise un concours à l'intention des élèves de 3ème. Ce concours porte sur l'utilisation des lentilles.</p>
+    <p>Pour se donner toutes les chances de ravir la première place, les élèves de la classe de 3ème 6 se proposent de :</p>
+    <ul>
+      <li>Distinguer les lentilles convergentes des lentilles divergentes ;</li>
+      <li>Déterminer le foyer d'une lentille ;</li>
+      <li>Construire l'image d'un objet à travers une lentille convergente.</li>
+    </ul>
+    <p>C'est pour répondre à ces objectifs que nous allons étudier cette leçon.</p>
+  </div>
+
+  <!-- CONTENU -->
+  <div class="bloc">
+    <div class="bloc-titre">B. Contenu de la leçon</div>
+
+    <!-- PARTIE 1 -->
+    <div class="bloc-sous">1 – Les types de lentilles</div>
+
+    <p><strong>a) Définition</strong></p>
+    <div class="definition">
+      Une <strong>lentille</strong> est un milieu transparent limité par deux surfaces dont au moins l'une est courbe (sphérique). Les lentilles sont généralement en verre ou en plastique transparent.
+    </div>
+
+    <p><strong>b) Lentille convergente</strong></p>
+    <div class="propriete">
+      Une <strong>lentille convergente</strong> est plus épaisse au centre qu'aux bords. Elle fait converger (se regrouper) un faisceau de lumière parallèle en un seul point appelé <strong>foyer image F'</strong>.<br>
+      🔍 Elle a un effet de loupe.
+    </div>
+
+    <div class="schema-container">
+      <div class="schema-label">Schéma – Lentille convergente</div>
+      <svg width="280" height="100" viewBox="0 0 280 100">
+        <!-- axe optique -->
+        <line x1="10" y1="50" x2="270" y2="50" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+        <!-- lentille convergente -->
+        <ellipse cx="140" cy="50" rx="8" ry="35" fill="none" stroke="#0ab395" stroke-width="2.5"/>
+        <line x1="140" y1="15" x2="140" y2="85" stroke="#0ab395" stroke-width="2.5"/>
+        <!-- flèches aux extrémités -->
+        <polygon points="140,12 137,20 143,20" fill="#0ab395"/>
+        <polygon points="140,88 137,80 143,80" fill="#0ab395"/>
+        <!-- rayons lumineux -->
+        <line x1="20" y1="30" x2="140" y2="30" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="140" y1="30" x2="210" y2="50" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+        <line x1="20" y1="50" x2="210" y2="50" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="20" y1="70" x2="140" y2="70" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="140" y1="70" x2="210" y2="50" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+        <!-- foyer F' -->
+        <circle cx="210" cy="50" r="3" fill="#ef4444"/>
+        <text x="215" y="45" font-size="11" fill="#ef4444" font-weight="bold">F'</text>
+        <!-- foyer F -->
+        <circle cx="70" cy="50" r="3" fill="#3b82f6"/>
+        <text x="75" y="45" font-size="11" fill="#3b82f6" font-weight="bold">F</text>
+        <!-- Centre O -->
+        <text x="143" y="44" font-size="10" fill="#1a2332">O</text>
+        <!-- symbole convergente -->
+        <text x="5" y="98" font-size="10" fill="#0ab395" font-weight="bold">Symbole :</text>
+        <line x1="80" y1="93" x2="130" y2="93" stroke="#0ab395" stroke-width="2"/>
+        <line x1="80" y1="93" x2="80" y2="93" stroke="#0ab395"/>
+        <polygon points="80,93 87,89 87,97" fill="#0ab395"/>
+        <polygon points="130,93 123,89 123,97" fill="#0ab395"/>
+      </svg>
+    </div>
+
+    <p><strong>c) Lentille divergente</strong></p>
+    <div class="propriete">
+      Une <strong>lentille divergente</strong> est plus mince au centre qu'aux bords. Elle fait diverger (s'écarter) un faisceau de lumière parallèle.<br>
+      👓 Elle est utilisée pour corriger la myopie.
+    </div>
+
+    <div class="schema-container">
+      <div class="schema-label">Schéma – Lentille divergente</div>
+      <svg width="280" height="100" viewBox="0 0 280 100">
+        <!-- axe optique -->
+        <line x1="10" y1="50" x2="270" y2="50" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+        <!-- lentille divergente (forme biconvexe inversée) -->
+        <path d="M132 15 Q140 50 132 85" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+        <path d="M148 15 Q140 50 148 85" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+        <line x1="132" y1="15" x2="148" y2="15" stroke="#ef4444" stroke-width="2.5"/>
+        <line x1="132" y1="85" x2="148" y2="85" stroke="#ef4444" stroke-width="2.5"/>
+        <!-- rayons lumineux divergents -->
+        <line x1="20" y1="30" x2="140" y2="30" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="140" y1="30" x2="230" y2="20" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+        <line x1="20" y1="50" x2="230" y2="50" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="20" y1="70" x2="140" y2="70" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="140" y1="70" x2="230" y2="80" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+        <!-- foyer virtuel F' -->
+        <circle cx="80" cy="50" r="3" fill="#ef4444"/>
+        <text x="60" y="45" font-size="11" fill="#ef4444" font-weight="bold">F'</text>
+        <text x="55" y="58" font-size="9" fill="#94a3b8">(virtuel)</text>
+        <!-- Centre O -->
+        <text x="143" y="44" font-size="10" fill="#1a2332">O</text>
+        <!-- symbole -->
+        <text x="5" y="98" font-size="10" fill="#ef4444" font-weight="bold">Symbole :</text>
+        <line x1="80" y1="93" x2="130" y2="93" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="80,93 87,97 87,89" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+        <polygon points="130,93 123,97 123,89" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- PARTIE 2 -->
+    <div class="bloc-sous">2 – Caractéristiques d'une lentille convergente</div>
+
+    <p><strong>a) Distance focale et vergence</strong></p>
+    <div class="definition">
+      La <strong>distance focale f</strong> est la distance entre le centre optique O et le foyer image F'. Elle s'exprime en <strong>mètre (m)</strong>.
+    </div>
+
+    <div class="definition">
+      La <strong>vergence C</strong> (ou puissance) d'une lentille est l'inverse de la distance focale :<br><br>
+      <strong>C = 1/f</strong> avec C en <strong>dioptrie (δ)</strong> et f en mètre (m).
+    </div>
+
+    <div class="unite">
+      • Lentille convergente : <strong>C &gt; 0</strong> (vergence positive)<br>
+      • Lentille divergente : <strong>C &lt; 0</strong> (vergence négative)<br>
+      • Deux lentilles accolées : <strong>C = C₁ + C₂</strong>
+    </div>
+
+    <!-- EXEMPLE 1 -->
+    <div class="exemple-box">
+      <div class="exemple-label">Exemple 1</div>
+      <p>Une lentille convergente a une distance focale f = 25 cm.</p>
+      <ol>
+        <li>Convertis f en mètre.</li>
+        <li>Calcule la vergence C de cette lentille.</li>
+        <li>Cette lentille est-elle convergente ou divergente ?</li>
+      </ol>
+      <div class="solution">
+        <div class="solution-label">✅ Solution</div>
+        <p>1. f = 25 cm = 0,25 m</p>
+        <p>2. C = 1/f = 1/0,25 = <strong>4 dioptries (δ)</strong></p>
+        <p>3. C = +4 δ &gt; 0, donc c'est une <strong>lentille convergente</strong>.</p>
+      </div>
+    </div>
+
+    <!-- FIXATION 1 -->
+    <div class="fixation">
+      <div class="fixation-label">Exercice de fixation 1</div>
+      <p>Une lentille a une vergence C = –5 δ.</p>
+      <ol>
+        <li>Cette lentille est-elle convergente ou divergente ? Justifie.</li>
+        <li>Calcule sa distance focale f.</li>
+        <li>Deux lentilles accolées ont des vergences C₁ = 4 δ et C₂ = 2 δ. Calcule la vergence équivalente.</li>
+      </ol>
+      <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+      <div class="sol-hidden">
+        <p>1. C = –5 δ &lt; 0, donc c'est une <strong>lentille divergente</strong>.</p>
+        <p>2. f = 1/C = 1/(–5) = <strong>–0,2 m = –20 cm</strong></p>
+        <p>3. C = C₁ + C₂ = 4 + 2 = <strong>6 δ</strong></p>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- PARTIE 3 -->
+    <div class="bloc-sous">3 – Image d'un objet à travers une lentille convergente</div>
+
+    <p><strong>a) Les rayons particuliers</strong></p>
+    <p>Pour construire l'image d'un objet, on utilise <strong>deux rayons particuliers</strong> :</p>
+    <div class="propriete">
+      <strong>Rayon 1 :</strong> Tout rayon parallèle à l'axe optique passe, après la lentille, par le foyer image F'.<br><br>
+      <strong>Rayon 2 :</strong> Tout rayon passant par le centre optique O n'est pas dévié (il passe tout droit).
+    </div>
+
+    <p><strong>b) Positions de l'image selon la position de l'objet</strong></p>
+    <table>
+      <tr>
+        <th>Position de l'objet</th>
+        <th>Image obtenue</th>
+      </tr>
+      <tr>
+        <td>Objet au-delà de 2F</td>
+        <td>Image réelle, renversée, plus petite</td>
+      </tr>
+      <tr>
+        <td>Objet sur 2F</td>
+        <td>Image réelle, renversée, même taille</td>
+      </tr>
+      <tr>
+        <td>Objet entre F et 2F</td>
+        <td>Image réelle, renversée, agrandie</td>
+      </tr>
+      <tr>
+        <td>Objet entre F et O</td>
+        <td>Image virtuelle, droite, agrandie</td>
+      </tr>
+    </table>
+
+    <p><strong>c) Le grandissement</strong></p>
+    <div class="definition">
+      Le <strong>grandissement γ</strong> est le rapport entre la taille de l'image et la taille de l'objet :
+    </div>
+    <div class="formule">γ = taille image / taille objet = OA' / OA</div>
+    <div class="unite">
+      • Si |γ| &gt; 1 : l'image est agrandie<br>
+      • Si |γ| &lt; 1 : l'image est réduite<br>
+      • Si γ &lt; 0 : l'image est renversée<br>
+      • Si γ &gt; 0 : l'image est droite
+    </div>
+
+    <!-- EXEMPLE 2 -->
+    <div class="exemple-box">
+      <div class="exemple-label">Exemple 2</div>
+      <p>Un objet AB de taille 2 cm donne une image A'B' de taille 6 cm à travers une lentille convergente.</p>
+      <ol>
+        <li>Calcule le grandissement.</li>
+        <li>L'image est-elle agrandie ou réduite ?</li>
+        <li>L'image est-elle droite ou renversée ?</li>
+      </ol>
+      <div class="solution">
+        <div class="solution-label">✅ Solution</div>
+        <p>1. γ = 6/2 = <strong>3</strong></p>
+        <p>2. |γ| = 3 &gt; 1, donc l'image est <strong>agrandie</strong>.</p>
+        <p>3. γ = +3 &gt; 0, donc l'image est <strong>droite</strong>.</p>
+      </div>
+    </div>
+
+    <!-- FIXATION 2 -->
+    <div class="fixation">
+      <div class="fixation-label">Exercice de fixation 2</div>
+      <p>Un objet de taille 4 cm donne une image de taille 2 cm à travers une lentille.</p>
+      <ol>
+        <li>Calcule le grandissement γ.</li>
+        <li>L'image est-elle agrandie, réduite ? Justifie.</li>
+        <li>L'image est-elle droite ou renversée ? Justifie.</li>
+      </ol>
+      <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+      <div class="sol-hidden">
+        <p>1. γ = 2/4 = <strong>0,5</strong></p>
+        <p>2. |γ| = 0,5 &lt; 1, donc l'image est <strong>réduite</strong>.</p>
+        <p>3. γ = +0,5 &gt; 0, donc l'image est <strong>droite</strong>.</p>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- PARTIE 4 -->
+    <div class="bloc-sous">4 – L'appareil photographique</div>
+    <div class="propriete">
+      L'appareil photographique fonctionne sur le <strong>même principe qu'une lentille convergente</strong> :<br>
+      • L'<strong>objectif</strong> joue le rôle de la lentille convergente.<br>
+      • La <strong>pellicule</strong> (ou capteur numérique) joue le rôle de l'écran.<br>
+      • L'image se forme sur la pellicule : elle est <strong>réelle, renversée et réduite</strong>.
+    </div>
+
+    <!-- RETENIR -->
+    <div class="retenir">
+      <div class="retenir-label">🔑 À retenir absolument</div>
+      <ul>
+        <li>Lentille <strong>convergente</strong> → plus épaisse au centre → C &gt; 0.</li>
+        <li>Lentille <strong>divergente</strong> → plus mince au centre → C &lt; 0.</li>
+        <li>Vergence : <strong>C = 1/f</strong> (en dioptries δ, f en mètres).</li>
+        <li>Deux lentilles accolées : <strong>C = C₁ + C₂</strong>.</li>
+        <li>Grandissement : <strong>γ = taille image / taille objet</strong>.</li>
+        <li>Appareil photo : objectif = lentille · pellicule = écran → image réelle et renversée.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- EXERCICES D'APPLICATION -->
+  <div class="lecon-titre" style="background:#1a2332">📝 Exercices d'application</div>
+
+  <!-- EX 1 -->
+  <div class="ex-final" style="--c:#3b82f6">
+    <div class="ex-num">Exercice 1</div>
+    <span class="tag tag-app">Application</span>
+    <p>On donne les vergences suivantes : C₁ = 6 δ ; C₂ = –4 δ ; C₃ = 10 δ.</p>
+    <ol>
+      <li>Pour chaque lentille, dis si elle est convergente ou divergente.</li>
+      <li>Calcule la distance focale de chaque lentille.</li>
+      <li>Calcule la vergence équivalente de C₁ et C₃ accolées.</li>
+    </ol>
+    <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+    <div class="sol-hidden">
+      <p><strong>1.</strong> C₁ = 6 δ &gt; 0 → <strong>convergente</strong> ; C₂ = –4 δ &lt; 0 → <strong>divergente</strong> ; C₃ = 10 δ &gt; 0 → <strong>convergente</strong></p>
+      <p><strong>2.</strong> f₁ = 1/6 ≈ <strong>0,167 m ≈ 16,7 cm</strong> ; f₂ = 1/(–4) = <strong>–0,25 m = –25 cm</strong> ; f₃ = 1/10 = <strong>0,1 m = 10 cm</strong></p>
+      <p><strong>3.</strong> C = C₁ + C₃ = 6 + 10 = <strong>16 δ</strong></p>
+    </div>
+  </div>
+
+  <!-- EX 2 -->
+  <div class="ex-final" style="--c:#10b981">
+    <div class="ex-num">Exercice 2</div>
+    <span class="tag tag-app">Application</span>
+    <p>Un objet AB de hauteur 3 cm est placé devant une lentille convergente de vergence C = 5 δ.</p>
+    <ol>
+      <li>Calcule la distance focale f de la lentille.</li>
+      <li>L'image A'B' obtenue a une hauteur de 9 cm. Calcule le grandissement.</li>
+      <li>L'image est-elle droite ou renversée ? Agrandie ou réduite ?</li>
+    </ol>
+    <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+    <div class="sol-hidden">
+      <p><strong>1.</strong> f = 1/C = 1/5 = <strong>0,2 m = 20 cm</strong></p>
+      <p><strong>2.</strong> γ = 9/3 = <strong>3</strong></p>
+      <p><strong>3.</strong> γ = +3 &gt; 0 → image <strong>droite</strong> ; |γ| = 3 &gt; 1 → image <strong>agrandie</strong>.</p>
+    </div>
+  </div>
+
+  <!-- EX 3 -->
+  <div class="ex-final" style="--c:#f59e0b">
+    <div class="ex-num">Exercice 3</div>
+    <span class="tag tag-app">Application</span>
+    <p>Complète le tableau suivant :</p>
+    <table>
+      <tr><th>Lentille</th><th>Vergence C (δ)</th><th>Type</th><th>Distance focale f (cm)</th></tr>
+      <tr><td>L₁</td><td>+8</td><td>?</td><td>?</td></tr>
+      <tr><td>L₂</td><td>–2</td><td>?</td><td>?</td></tr>
+      <tr><td>L₃</td><td>?</td><td>Convergente</td><td>50</td></tr>
+    </table>
+    <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+    <div class="sol-hidden">
+      <p><strong>L₁ :</strong> convergente · f = 1/8 = 0,125 m = <strong>12,5 cm</strong></p>
+      <p><strong>L₂ :</strong> divergente · f = 1/(–2) = –0,5 m = <strong>–50 cm</strong></p>
+      <p><strong>L₃ :</strong> f = 50 cm = 0,5 m · C = 1/0,5 = <strong>+2 δ</strong></p>
+    </div>
+  </div>
+
+  <!-- EX 4 APPROFONDISSEMENT -->
+  <div class="ex-final" style="--c:#8b5cf6">
+    <div class="ex-num">Exercice 4</div>
+    <span class="tag tag-appro">Approfondissement</span>
+    <p>Un photographe utilise un appareil dont l'objectif a une vergence de 40 δ.</p>
+    <ol>
+      <li>Calcule la distance focale de l'objectif.</li>
+      <li>Explique le rôle de l'objectif et de la pellicule dans la formation de l'image.</li>
+      <li>Un objet de 5 m de hauteur est photographié. Son image sur la pellicule mesure 2 cm. Calcule le grandissement. L'image est-elle renversée ?</li>
+    </ol>
+    <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+    <div class="sol-hidden">
+      <p><strong>1.</strong> f = 1/40 = <strong>0,025 m = 2,5 cm</strong></p>
+      <p><strong>2.</strong> L'objectif est une <strong>lentille convergente</strong> qui capte la lumière et forme l'image. La <strong>pellicule</strong> (ou capteur) est l'écran sur lequel se forme l'image.</p>
+      <p><strong>3.</strong> γ = 0,02/5 = <strong>0,004</strong> · |γ| &lt; 1 → image réduite · γ &gt; 0 → image droite en valeur absolue. En réalité l'image est <strong>renversée</strong> (sens négatif) et très réduite.</p>
+    </div>
+  </div>
+
+  <!-- EX 5 APPROFONDISSEMENT -->
+  <div class="ex-final" style="--c:#ef4444">
+    <div class="ex-num">Exercice 5</div>
+    <span class="tag tag-appro">Approfondissement</span>
+    <p>Deux lentilles L₁ (convergente, f₁ = 20 cm) et L₂ (divergente, f₂ = –50 cm) sont accolées.</p>
+    <ol>
+      <li>Calcule les vergences C₁ et C₂.</li>
+      <li>Calcule la vergence équivalente C du système.</li>
+      <li>Calcule la distance focale équivalente. Ce système est-il convergent ou divergent ?</li>
+    </ol>
+    <button class="btn-sol" onclick="toggleSol(this)">👁 Voir la solution</button>
+    <div class="sol-hidden">
+      <p><strong>1.</strong> C₁ = 1/0,20 = <strong>+5 δ</strong> · C₂ = 1/(–0,50) = <strong>–2 δ</strong></p>
+      <p><strong>2.</strong> C = C₁ + C₂ = 5 + (–2) = <strong>+3 δ</strong></p>
+      <p><strong>3.</strong> f = 1/3 ≈ <strong>0,333 m ≈ 33,3 cm</strong> · C &gt; 0 → système <strong>convergent</strong>.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSol(btn) {
+  var sol = btn.nextElementSibling;
+  sol.classList.toggle('show');
+  btn.textContent = sol.classList.contains('show') ? '🙈 Masquer' : '👁 Voir la solution';
+}
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Science CI PRO</title>
+<style>
+:root{--bg:#0b0f1a;--card:#161e2d;--orange:#f97316;--green:#10b981;--red:#ef4444;--border:#1e293b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:'Segoe UI',sans-serif;padding:14px;min-height:100vh}
+h2{text-align:center;color:var(--orange);font-size:1.3rem;margin-bottom:18px;letter-spacing:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.card{background:var(--card);padding:18px 10px;border-radius:14px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.9rem;transition:border-color .2s}
+.card:active{opacity:.8}.card:hover{border-color:var(--orange)}
+.card span{display:block;font-size:1.8rem;margin-bottom:6px}
+
+/* SECTION TITRE */
+.section-titre{font-size:.75rem;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin:6px 0 10px;padding-left:4px}
+
+/* COURS */
+#cours-box{display:none;background:#161e2d;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px;overflow:hidden}
+.cours-header{background:linear-gradient(135deg,#0ab395,#0891b2);padding:14px;display:flex;align-items:center;gap:10px}
+.cours-header-icon{font-size:1.8rem}
+.cours-header-text h3{font-size:1rem;font-weight:900;color:white;margin-bottom:2px}
+.cours-header-text p{font-size:.75rem;color:rgba(255,255,255,.8)}
+.matiere-bloc{padding:12px 14px}
+.matiere-titre{font-size:.72rem;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.matiere-titre::before{content:'';display:block;width:20px;height:2px;background:var(--orange);border-radius:2px}
+.cours-liste{display:flex;flex-direction:column;gap:8px}
+.cours-item{background:#0f172a;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid #1e293b;transition:border-color .2s;text-decoration:none}
+.cours-item:hover{border-color:#0ab395}
+.cours-item:active{opacity:.8}
+.cours-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.cours-info{flex:1}
+.cours-nom{font-size:.86rem;font-weight:800;color:white;margin-bottom:2px}
+.cours-detail{font-size:.72rem;color:#64748b}
+.cours-arrow{font-size:.9rem;color:#64748b}
+.sep-matiere{height:1px;background:#1e293b;margin:10px 0}
+.fermer-btn{width:100%;padding:12px;border:none;background:var(--red);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'Segoe UI',sans-serif}
+
+/* CALC */
+#calc-box{display:none;background:#1e293b;padding:14px;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px}
+.screen{width:100%;min-height:54px;background:#000;color:#0f0;text-align:right;font-size:1.3rem;padding:10px 14px;border:none;border-radius:8px;font-family:monospace;word-break:break-all}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.btns button{padding:15px 4px;border-radius:8px;border:none;background:#334155;color:#fff;font-weight:700;font-size:1rem;cursor:pointer}
+.btns button:active{opacity:.7}
+.op{background:var(--orange)!important}
+.eq{background:var(--green)!important;grid-column:span 4}
+.cl{background:var(--red)!important}
+.dl{background:#64748b!important}
+
+/* GRAPH */
+#graph-box{display:none;background:#1e293b;padding:0;border-radius:14px;border:1px solid var(--orange);margin-bottom:18px;overflow:hidden}
+.graph-top{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:14px 14px 0}
+#fn-input{flex:1;min-width:160px;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:1rem}
+#btn-draw{padding:10px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+#btn-reset{padding:10px 14px;border-radius:8px;border:none;background:#334155;color:#fff;cursor:pointer;font-size:1rem}
+#graph-canvas{width:100%;border-radius:0;display:block;touch-action:none}
+.graph-hint{font-size:.75rem;color:#64748b;margin-top:6px;text-align:center;padding:0 14px 14px}
+#fn-error{color:#f87171;font-size:.8rem;margin-top:4px;min-height:16px;padding:0 14px}
+</style>
+</head>
+<body>
+
+<h2>⚗️ SCIENCE CI PRO</h2>
+
+<div class="grid">
+  <div class="card" onclick="openCalc()"><span>🧮</span>Calculatrice</div>
+  <div class="card" onclick="openGraph()"><span>📈</span>Grapheur Pro</div>
+</div>
+
+<!-- BOUTON COURS -->
+<div class="grid" style="grid-template-columns:1fr;margin-bottom:18px">
+  <div class="card" onclick="openCours()" style="padding:16px 10px">
+    <span>📚</span>Cours 3ème
+    <div style="font-size:.72rem;color:#64748b;margin-top:4px">Physique · Chimie · CI</div>
+  </div>
+</div>
+
+<!-- SECTION COURS -->
+<div id="cours-box">
+  <div class="cours-header">
+    <div class="cours-header-icon">📚</div>
+    <div class="cours-header-text">
+      <h3>Cours de 3ème</h3>
+      <p>Physique-Chimie · Côte d'Ivoire</p>
+    </div>
+  </div>
+
+  <!-- OPTIQUE -->
+  <div class="matiere-bloc">
+    <div class="matiere-titre">⚡ Physique – Optique</div>
+    <div class="cours-liste">
+      <a class="cours-item" href="lecon1_les_lentilles.html">
+        <div class="cours-icon" style="background:rgba(10,179,149,.15)">🔍</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Lentilles</div>
+          <div class="cours-detail">Leçon 1 · Vergence · Construction d'image · Tracé</div>
+        </div>
+        <div class="cours-arrow">›</div>
+      </a>
+      <a class="cours-item" href="lecon2_defauts_oeil.html">
+        <div class="cours-icon" style="background:rgba(59,130,246,.15)">👁️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Défauts de l'Œil</div>
+          <div class="cours-detail">Leçon 2 · Myopie · Hypermétropie · Correction</div>
+        </div>
+        <div class="cours-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- MÉCANIQUE (à venir) -->
+    <div class="matiere-titre">⚙️ Physique – Mécanique</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">⚖️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Poids et Masse</div>
+          <div class="cours-detail">Leçon 3 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">💪</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Forces</div>
+          <div class="cours-detail">Leçon 4 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(249,115,22,.15)">⚡</div>
+        <div class="cours-info">
+          <div class="cours-nom">Travail & Puissance</div>
+          <div class="cours-detail">Leçon 5 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- ÉLECTRICITÉ (à venir) -->
+    <div class="matiere-titre">🔌 Physique – Électricité</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(234,179,8,.15)">💡</div>
+        <div class="cours-info">
+          <div class="cours-nom">Puissance & Énergie Électrique</div>
+          <div class="cours-detail">Leçon 6 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+
+    <div class="sep-matiere"></div>
+
+    <!-- CHIMIE (à venir) -->
+    <div class="matiere-titre">🧪 Chimie</div>
+    <div class="cours-liste">
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">⚗️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Électrolyse & Synthèse de l'eau</div>
+          <div class="cours-detail">Leçon 7 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">🛢️</div>
+        <div class="cours-info">
+          <div class="cours-nom">Les Alcanes</div>
+          <div class="cours-detail">Leçon 8 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+      <div class="cours-item" style="opacity:.4;cursor:not-allowed">
+        <div class="cours-icon" style="background:rgba(168,85,247,.15)">🧫</div>
+        <div class="cours-info">
+          <div class="cours-nom">Solutions Acides & Basiques</div>
+          <div class="cours-detail">Leçon 9 · Bientôt disponible</div>
+        </div>
+        <div class="cours-arrow">🔒</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fermer-btn" onclick="closeCours()">✕ Fermer</button>
+</div>
+
+<!-- CALCULATRICE -->
+<div id="calc-box">
+  <div id="screen" class="screen">0</div>
+  <div class="btns">
+    <button class="cl" onclick="clr()">C</button>
+    <button class="dl" onclick="del()">⌫</button>
+    <button onclick="add('(')">(</button>
+    <button onclick="add(')')">)</button>
+    <button onclick="add('Math.sqrt(')">√</button>
+    <button onclick="add('Math.PI')">π</button>
+    <button onclick="add('**2')">x²</button>
+    <button class="op" onclick="add('/')">÷</button>
+    <button onclick="add('7')">7</button>
+    <button onclick="add('8')">8</button>
+    <button onclick="add('9')">9</button>
+    <button class="op" onclick="add('*')">×</button>
+    <button onclick="add('4')">4</button>
+    <button onclick="add('5')">5</button>
+    <button onclick="add('6')">6</button>
+    <button class="op" onclick="add('-')">−</button>
+    <button onclick="add('1')">1</button>
+    <button onclick="add('2')">2</button>
+    <button onclick="add('3')">3</button>
+    <button class="op" onclick="add('+')">+</button>
+    <button onclick="add('0')" style="grid-column:span 2">0</button>
+    <button onclick="add('.')">.</button>
+    <button class="op" onclick="add('%')">%</button>
+    <button class="eq" onclick="calc()">=</button>
+  </div>
+  <button class="fermer-btn" style="margin-top:10px;border-radius:8px" onclick="closeCalc()">✕ Fermer</button>
+</div>
+
+<!-- GRAPHEUR -->
+<div id="graph-box">
+  <div class="graph-top">
+    <input id="fn-input" type="text" placeholder="Ex: x**2 ou Math.sin(x)" autocomplete="off"/>
+    <button id="btn-draw" onclick="drawGraph()">Tracer</button>
+    <button id="btn-reset" onclick="resetView()">↺</button>
+  </div>
+  <div id="fn-error"></div>
+  <canvas id="graph-canvas"></canvas>
+  <div class="graph-hint">Glisse pour déplacer · Pinch pour zoomer</div>
+  <button class="fermer-btn" onclick="closeGraph()">✕ Fermer</button>
+</div>
+
+<script>
+// ── NAVIGATION ──
+function openCalc(){
+  document.getElementById('calc-box').style.display='block';
+  document.getElementById('graph-box').style.display='none';
+  document.getElementById('cours-box').style.display='none';
+}
+function closeCalc(){document.getElementById('calc-box').style.display='none';}
+
+function openGraph(){
+  document.getElementById('calc-box').style.display='none';
+  document.getElementById('graph-box').style.display='block';
+  document.getElementById('cours-box').style.display='none';
+  setTimeout(initCanvas,50);
+}
+function closeGraph(){document.getElementById('graph-box').style.display='none';}
+
+function openCours(){
+  document.getElementById('cours-box').style.display='block';
+  document.getElementById('calc-box').style.display='none';
+  document.getElementById('graph-box').style.display='none';
+  document.getElementById('cours-box').scrollIntoView({behavior:'smooth'});
+}
+function closeCours(){document.getElementById('cours-box').style.display='none';}
+
+// ── CALCULATRICE ──
+var expr='';
+function screen(){return document.getElementById('screen');}
+function add(v){if(expr==='0')expr='';expr+=v;screen().textContent=expr;}
+function clr(){expr='';screen().textContent='0';}
+function del(){expr=expr.slice(0,-1);screen().textContent=expr||'0';}
+function calc(){
+  try{var r=Function('"use strict";return('+expr+')')();expr=String(parseFloat(r.toFixed(10)));screen().textContent=expr;}
+  catch(e){screen().textContent='Erreur';expr='';}
+}
+
+// ── GRAPHEUR ──
+var canvas,ctx,W,H,ox=0,oy=0,scale=60,userFn=null;
+var drag={active:false,lastX:0,lastY:0};
+var pinch={active:false,lastDist:0};
+
+function initCanvas(){
+  canvas=document.getElementById('graph-canvas');
+  var box=canvas.parentElement.getBoundingClientRect();
+  W=box.width;H=Math.min(W*0.8,window.innerHeight*0.5);
+  canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');
+  resetView();bindEvents();
+}
+function resetView(){ox=0;oy=0;scale=60;redraw();}
+function toCanvas(mx,my){return{x:W/2+(mx-ox)*scale,y:H/2-(my-oy)*scale};}
+function toMath(cx,cy){return{x:ox+(cx-W/2)/scale,y:oy-(cy-H/2)/scale};}
+function redraw(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  drawGrid();drawAxes();if(userFn)plotFn(userFn);
+}
+function drawGrid(){
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+  var step=niceStep(scale);
+  var xMin=toMath(0,0).x,xMax=toMath(W,0).x,yMin=toMath(0,H).y,yMax=toMath(0,0).y;
+  var x0=Math.ceil(xMin/step)*step;
+  for(var x=x0;x<=xMax;x+=step){var cx=toCanvas(x,0).x;ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();}
+  var y0=Math.floor(yMin/step)*step;
+  for(var y=y0;y<=yMax;y+=step){var cy=toCanvas(0,y).y;ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();}
+  ctx.fillStyle='#475569';ctx.font='10px monospace';ctx.textAlign='center';
+  for(var x=x0;x<=xMax;x+=step){if(Math.abs(x)<1e-9)continue;var cx=toCanvas(x,0).x,ay=toCanvas(0,0).y;ay=Math.max(12,Math.min(H-4,ay));ctx.fillText(round2(x),cx,ay+12);}
+  ctx.textAlign='right';
+  for(var y=y0;y<=yMax;y+=step){if(Math.abs(y)<1e-9)continue;var cy=toCanvas(0,y).y,ax=toCanvas(0,0).x;ax=Math.max(28,Math.min(W-4,ax));ctx.fillText(round2(y),ax-4,cy+4);}
+}
+function drawAxes(){
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;
+  var o=toCanvas(0,0);
+  ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+  ctx.fillStyle='#94a3b8';arrow(W,o.y,'r');arrow(o.x,0,'u');
+  ctx.font='bold 12px monospace';ctx.fillStyle='#f97316';
+  ctx.textAlign='left';ctx.fillText('x',W-14,o.y-6);
+  ctx.textAlign='center';ctx.fillText('y',o.x+8,12);
+}
+function arrow(x,y,dir){
+  ctx.beginPath();
+  if(dir==='r'){ctx.moveTo(x,y);ctx.lineTo(x-8,y-4);ctx.lineTo(x-8,y+4);}
+  if(dir==='u'){ctx.moveTo(x,y);ctx.lineTo(x-4,y+8);ctx.lineTo(x+4,y+8);}
+  ctx.closePath();ctx.fill();
+}
+function plotFn(fn){
+  var steps=W*2,xMin=toMath(0,0).x,xMax=toMath(W,0).x,dx=(xMax-xMin)/steps;
+  ctx.strokeStyle='#f97316';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.beginPath();
+  var started=false;
+  for(var i=0;i<=steps;i++){
+    var mx=xMin+i*dx,my;
+    try{my=fn(mx);}catch(e){started=false;continue;}
+    if(!isFinite(my)||isNaN(my)){started=false;continue;}
+    var c=toCanvas(mx,my);
+    if(!started){ctx.moveTo(c.x,c.y);started=true;}else ctx.lineTo(c.x,c.y);
+  }
+  ctx.stroke();
+}
+function niceStep(sc){var raw=80/sc,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;if(n<1.5)return mag;if(n<3.5)return 2*mag;if(n<7.5)return 5*mag;return 10*mag;}
+function round2(v){return parseFloat(v.toPrecision(4));}
+function drawGraph(){
+  var raw=document.getElementById('fn-input').value.trim();
+  var err=document.getElementById('fn-error');err.textContent='';
+  if(!raw){err.textContent='⚠ Entre une fonction.';return;}
+  var expr2=raw.replace(/\^/g,'**');
+  var fn;
+  try{fn=new Function('x','return '+expr2+';');fn(0);}catch(e){err.textContent='⚠ Erreur : '+e.message;return;}
+  userFn=fn;redraw();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('fn-input').addEventListener('keydown',function(e){if(e.key==='Enter')drawGraph();});
+});
+function bindEvents(){
+  canvas.addEventListener('mousedown',onDown);canvas.addEventListener('mousemove',onMove);canvas.addEventListener('mouseup',onUp);
+  canvas.addEventListener('wheel',onWheel,{passive:false});
+  canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+  canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+  canvas.addEventListener('touchend',onTouchEnd);
+}
+function onDown(e){drag.active=true;drag.lastX=e.clientX;drag.lastY=e.clientY;}
+function onMove(e){if(!drag.active)return;var dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.clientX;drag.lastY=e.clientY;redraw();}
+function onUp(){drag.active=false;}
+function onWheel(e){e.preventDefault();var factor=e.deltaY<0?1.15:0.87;var rect=canvas.getBoundingClientRect();var mx=toMath(e.clientX-rect.left,e.clientY-rect.top);scale*=factor;ox=mx.x-(e.clientX-rect.left-W/2)/scale;oy=mx.y+(e.clientY-rect.top-H/2)/scale;redraw();}
+function dist(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+function mid(t){return{x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2};}
+function onTouchStart(e){e.preventDefault();if(e.touches.length===1){drag.active=true;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;pinch.active=false;}else if(e.touches.length===2){drag.active=false;pinch.active=true;pinch.lastDist=dist(e.touches);pinch.lastMid=mid(e.touches);}}
+function onTouchMove(e){e.preventDefault();if(pinch.active&&e.touches.length===2){var d=dist(e.touches),m=mid(e.touches),rect=canvas.getBoundingClientRect(),cx=m.x-rect.left,cy=m.y-rect.top,mathPt=toMath(cx,cy);scale*=d/pinch.lastDist;ox=mathPt.x-(cx-W/2)/scale;oy=mathPt.y+(cy-H/2)/scale;pinch.lastDist=d;pinch.lastMid=m;redraw();}else if(drag.active&&e.touches.length===1){var dx=e.touches[0].clientX-drag.lastX,dy=e.touches[0].clientY-drag.lastY;ox-=dx/scale;oy+=dy/scale;drag.lastX=e.touches[0].clientX;drag.lastY=e.touches[0].clientY;redraw();}}
+function onTouchEnd(e){if(e.touches.length<2)pinch.active=false;if(e.touches.length===0)drag.active=false;}
+</script>
+</body>
+</html>
